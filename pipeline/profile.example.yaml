@@ -1,0 +1,33 @@
+# nightshift profile — copy to profile.yaml and make it yours.
+# Ideas extracted from your content are scored 0-100 against this profile.
+# Matching is keyword-based: short, concrete phrases work best.
+
+name: example
+
+# What you care about. A full phrase match counts most; a single significant
+# word (5+ letters) from a phrase counts half.
+interests:
+  - developer tools
+  - knowledge management
+  - privacy
+  - education
+  - automation
+  - documentation
+
+# What you can build or deliver yourself.
+skills:
+  - python
+  - writing
+  - web development
+  - data analysis
+
+# Topics you never want to pursue. Each full match costs 30 points.
+avoid:
+  - crypto
+  - gambling
+  - dropshipping
+
+constraints:
+  solo: true              # penalise ideas that need a team or hiring
+  max_budget_usd: 1000    # penalise ideas citing costs above this amount
+  hours_per_week: 10      # below 20, ideas that look full-time are penalised

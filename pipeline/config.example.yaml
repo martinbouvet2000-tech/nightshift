@@ -1,0 +1,71 @@
+# nightshift configuration — copy to nightshift.yaml and edit.
+#
+# Lookup order: --config PATH, then $NIGHTSHIFT_CONFIG, then ./nightshift.yaml
+# (or .yml / .json). Relative paths are resolved against this file's folder.
+# Every key is optional; the values below are the defaults unless noted.
+
+# Markdown vault to write into (an Obsidian vault works). REQUIRED.
+# The NIGHTSHIFT_VAULT environment variable overrides this value.
+vault_path: ./vault
+
+# Where sync state lives (processed IDs, retry counters).
+# Default: <vault_path>/.nightshift  (dot-folders are ignored by Obsidian)
+state_dir: null
+
+# Your profile for idea-fit scoring. See profile.example.yaml.
+# null = ideas are still extracted, but scored without personal fit.
+profile_path: ./profile.yaml
+
+# Sub-folders of the vault for each note type. Nested paths ("AI/Sources") work;
+# anything that would escape the vault is rejected.
+folders:
+  sources: Sources   # one note per video / transcript
+  tools: Tools       # one note per tool, aggregating every mention
+  ideas: Ideas       # one note per extracted idea, with profile-fit score
+  digest: Digest     # one digest note per day
+
+llm:
+  # auto          -> `claude -p` if the claude CLI is on PATH,
+  #                  else the Anthropic API if ANTHROPIC_API_KEY is set,
+  #                  else the offline regex extractor
+  # claude-cli | anthropic-api | regex -> force one backend
+  backend: auto
+  api_model: claude-sonnet-5        # model id for the Anthropic API backend
+  cli_model: sonnet                 # --model passed to `claude -p` (empty = CLI default)
+  api_base_url: https://api.anthropic.com
+  max_tokens: 4000
+  timeout_seconds: 300              # per call
+  max_transcript_chars: 40000       # longer transcripts are truncated in the prompt
+  circuit_breaker_threshold: 5      # consecutive failures before LLM calls stop for the run
+  # API keys are NEVER read from this file: export ANTHROPIC_API_KEY instead.
+
+scoring:
+  noise_threshold: 35               # items below this signal score are listed as low signal
+
+linking:
+  max_links: 6                      # related notes added to each source note
+
+sources:
+  youtube:
+    enabled: false                  # requires: pip install "nightshift[youtube]"
+    urls:                           # channels (/@handle) or playlists
+      - https://www.youtube.com/@example-channel
+      - https://www.youtube.com/playlist?list=EXAMPLE_PLAYLIST_ID
+    max_per_source: 15              # latest N videos inspected per URL
+    max_new_per_run: 12             # cap on new videos per run, all URLs combined
+    languages: [en, en-US, en-GB]   # subtitle languages, in order of preference
+    cookies_from_browser: null      # e.g. firefox, if YouTube asks you to sign in
+    max_attempts: 3                 # runs to retry a video without subtitles before giving up
+
+  local:
+    enabled: true
+    drop_folder: ./inbox            # .txt .md .vtt .srt used directly;
+                                    # audio/video transcribed with Whisper if installed
+    recursive: false
+    whisper_model: base             # tiny | base | small | medium | large
+
+# Teach the regex extractor about tools that are not in the built-in catalog.
+extra_tools: {}
+#   MyTool:
+#     variants: [mytool, my tool]
+#     category: coding

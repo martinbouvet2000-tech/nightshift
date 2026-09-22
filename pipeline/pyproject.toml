@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nightshift"
+version = "0.1.0"
+description = "Nightly knowledge pipeline: turn videos and transcripts into a linked Markdown second brain."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+youtube = ["yt-dlp>=2024.1.0"]
+whisper = ["openai-whisper>=20231117"]
+dev = ["pytest>=7.0"]
+all = ["yt-dlp>=2024.1.0", "openai-whisper>=20231117"]
+
+[project.scripts]
+nightshift = "nightshift.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

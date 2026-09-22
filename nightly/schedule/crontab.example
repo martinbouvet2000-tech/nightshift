@@ -1,0 +1,6 @@
+# nightshift — nightly vault consolidation (Linux / macOS cron). Edit with `crontab -e`.
+# cron has a minimal PATH: use absolute paths for node and claude (see `which node claude`).
+# Runs at 05:30 local time; a run before 06:00 consolidates the previous day's journal.
+NIGHTSHIFT_VAULT=/home/you/notes
+NIGHTSHIFT_CLAUDE=/home/you/.local/bin/claude
+30 5 * * * /usr/bin/node /opt/nightshift/nightly/runner.mjs --backup >> /home/you/.nightshift/cron.log 2>&1

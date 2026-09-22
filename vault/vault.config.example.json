@@ -1,0 +1,26 @@
+{
+  "folders": {
+    "inbox": "0 - Inbox",
+    "projects": "1 - Projects",
+    "areas": "2 - Areas",
+    "resources": "3 - Resources",
+    "archives": "4 - Archives",
+    "journal": "Journal",
+    "templates": "Templates"
+  },
+  "folderTags": {
+    "inbox": "inbox",
+    "projects": "project",
+    "areas": "area",
+    "resources": "resource",
+    "archives": "archive",
+    "journal": "journal"
+  },
+  "ignoreDirs": [".obsidian", ".trash", ".git", "node_modules", ".nightshift", "scripts"],
+  "rootAllowed": ["HOME.md", "README.md"],
+  "generatedNotes": ["^Weekly Digest\\.md$", "^Radar - .*\\.md$"],
+  "indexFile": "VAULT_INDEX.md",
+  "inboxMax": 10,
+  "inboxMaxAgeDays": 7,
+  "maintenanceLock": ".nightshift/maintenance.lock"
+}

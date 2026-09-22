@@ -1,0 +1,62 @@
+WEBVTT
+Kind: captions
+Language: en
+
+NOTE
+Invented sample captions for the nightshift demo. Creator: Lena Moreau (fictional).
+
+1
+00:00:00.000 --> 00:00:06.000
+In ten minutes I want to explain retrieval augmented generation, or RAG, without any hype.
+
+2
+00:00:06.000 --> 00:00:13.000
+The idea is simple. Instead of hoping the model remembers your documents, you retrieve the relevant pieces and put them in the prompt.
+
+3
+00:00:13.000 --> 00:00:21.000
+Step one is chunking. Split your documents into pieces of a few hundred words, with a small overlap so sentences are not cut in half.
+
+4
+00:00:21.000 --> 00:00:29.000
+Step two is embeddings. Each chunk becomes a vector, and you store the vectors in a database. I use Supabase with the vector extension, but Pinecone works just as well.
+
+5
+00:00:29.000 --> 00:00:38.000
+Step three is retrieval. When a question comes in, you embed the question, find the five closest chunks, and paste them into the prompt with the question.
+
+6
+00:00:38.000 --> 00:00:47.000
+The trick is to also store the title and the section heading with every chunk, because retrieval quality jumps when the chunk knows where it came from.
+
+7
+00:00:47.000 --> 00:00:56.000
+For the prompt itself I use: "Answer the question using only the context below. If the context does not contain the answer, say you do not know and list what is missing."
+
+8
+00:00:56.000 --> 00:01:05.000
+That last sentence matters. It cuts made-up answers dramatically, and it tells you which documents you should add to the knowledge base.
+
+9
+00:01:05.000 --> 00:01:14.000
+You can build all of this with LangChain in an afternoon, and I wrote most of my glue code in Cursor agent mode, which handled the boring parts really well.
+
+10
+00:01:14.000 --> 00:01:22.000
+A common mistake is chunks that are too large. With huge chunks the retrieval step returns vague matches and the answer quality drops.
+
+11
+00:01:22.000 --> 00:01:31.000
+Another pattern I like is hybrid search, which combines keyword search with vector search. Keyword search catches exact product names and error codes that embeddings often miss.
+
+12
+00:01:31.000 --> 00:01:40.000
+If you want a side project idea, someone should build a RAG starter kit for internal documentation of small software teams, with a one-click import from a wiki.
+
+13
+00:01:40.000 --> 00:01:48.000
+Teams of 10 to 50 developers waste hours every week searching old docs, and they would happily pay for something that just works.
+
+14
+00:01:48.000 --> 00:01:55.000
+That is RAG in ten minutes. Start with a small set of documents, measure the answers, and only then scale up.

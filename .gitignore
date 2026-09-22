@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+
+# Node
+node_modules/
+
+# Local config and runtime state: never commit
+.env
+.env.*
+config.yaml
+config.json
+profile.yaml
+vault.config.json
+!**/*.example.*
+state.json
+*.state.json
+*.lock
+*.log
+
+# Demo output
+demo-vault/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,18 @@
+Title: I Replaced My Whole Agency Workflow With AI Agents
+Author: Dana Whitfield (fictional)
+URL: https://example.com/videos/agency-agents
+Published: 2026-09-02
+
+Okay so this is going to blow your mind. I run a small marketing agency and I replaced almost my entire workflow with AI agents. Comment the word AGENTS below and I will send you my full template, and make sure you check the link in bio for the free course.
+
+So here is what the stack looks like. Leads come in through a form, Zapier catches them and pushes them to a CrewAI crew with three agents: a researcher, a writer and a reviewer. The researcher agent looks up the company, the writer agent drafts a personalised proposal, and the reviewer agent checks it against our brand guidelines. Then the proposal goes back into our CRM through Make.com.
+
+Honestly the results have been crazy. We used to spend around six hours on each proposal and now it is basically twenty minutes of human review. Our close rate went from 18 percent to 26 percent over two months, although to be fair we also changed our pricing in the same period, so I would not attribute all of it to the agents.
+
+The trick is to give every agent a very narrow job. When I had a single agent doing everything, the proposals were generic and full of filler. Splitting the job into research, writing and review made each step easier to check, and when something goes wrong I know exactly which agent to fix.
+
+I also use ChatGPT for quick brainstorming and Canva for the proposal design, and everything gets logged in Airtable so I can see which proposals converted.
+
+Here is a business idea if you want one. You could start a done-for-you agent setup service for small agencies, charging around $5k per setup, but honestly you would need to hire a team of developers to deliver it at scale, and you would be on call around the clock when things break.
+
+Anyway, follow for more, and do not forget to comment AGENTS and I will send you everything. This offer is only for a limited time, so don't miss out.
