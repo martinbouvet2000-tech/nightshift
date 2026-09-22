@@ -40,7 +40,7 @@
     <!-- output, revealed one line at a time -->
     <g clip-path="url(#outClip)">
       <text xml:space="preserve" x="30" y="106"><tspan fill="#3fb950">nightshift run complete</tspan><tspan fill="#6e7681"> in 0.3s</tspan></text>
-      <text xml:space="preserve" x="30" y="128"><tspan fill="#58a6ff">  vault:</tspan><tspan fill="#c9d1d9">     C:\ns\demo-vault</tspan></text>
+      <text xml:space="preserve" x="30" y="128"><tspan fill="#58a6ff">  vault:</tspan><tspan fill="#c9d1d9">     ~/nightshift/demo-vault</tspan></text>
       <text xml:space="preserve" x="30" y="150"><tspan fill="#58a6ff">  backend:</tspan><tspan fill="#8b949e">   regex (LLM calls: 0, circuit breaker: closed)</tspan></text>
       <text xml:space="preserve" x="30" y="172"><tspan fill="#58a6ff">  items:</tspan><tspan fill="#8b949e">     4 collected, 4 processed, 0 skipped, 0 error(s)</tspan></text>
       <text xml:space="preserve" x="30" y="194"><tspan fill="#58a6ff">  notes:</tspan><tspan fill="#8b949e">     4 sources, 17 tools, 4 ideas, 1 digest</tspan></text>
@@ -55,7 +55,7 @@
       <text xml:space="preserve" x="30" y="392"><tspan fill="#d29922">     35</tspan><tspan fill="#d29922">  weak fit</tspan><tspan fill="#c9d1d9">         Small prompt library tool for customer support teams</tspan></text>
       <text xml:space="preserve" x="30" y="414"><tspan fill="#d29922">      5</tspan><tspan fill="#6e7681">  skip</tspan><tspan fill="#8b949e">             Done-for-you agent setup service for small agencies</tspan></text>
       <text xml:space="preserve" x="30" y="436"><tspan fill="#58a6ff">  digest:</tspan><tspan fill="#8b949e">    Digest/Digest 2026-09-23.md</tspan></text>
-      <text xml:space="preserve" x="30" y="458"><tspan fill="#6e7681">Open C:\ns\demo-vault in Obsidian (or any Markdown editor) to browse the result.</tspan></text>
+      <text xml:space="preserve" x="30" y="458"><tspan fill="#6e7681">Open ~/nightshift/demo-vault in Obsidian (or any Markdown editor) to browse the result.</tspan></text>
     </g>
   </g>
 
