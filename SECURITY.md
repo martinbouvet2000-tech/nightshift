@@ -11,7 +11,7 @@ nightshift is at v0.1. Only `main` is supported; fixes land there and are noted 
 
 - Preferred: [open a private security advisory](https://github.com/martinbouvet2000-tech/nightshift/security/advisories/new)
   on GitHub.
-- Alternative: email **martinbouvet2000@gmail.com** with `nightshift security` in the subject.
+- Alternative: open a regular issue **without technical details** and ask for a private channel.
 
 Please include what you can: affected file or command, a minimal reproduction, the impact you
 think it has, and your environment (OS, Python and Node versions). A proof-of-concept vault or
