@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="484" viewBox="0 0 860 484" role="img" aria-labelledby="dt dd">
+  <title id="dt">nightshift demo</title>
+  <desc id="dd">Terminal replay of a real `nightshift demo` run: the offline pipeline processes four bundled transcripts and writes 4 source notes, 17 tool notes, 4 ideas and 1 digest to demo-vault.</desc>
+
+  <defs>
+    <clipPath id="typeClip">
+      <rect x="28" y="56" width="152" height="28">
+        <animate attributeName="width" values="0;152;152" keyTimes="0;0.115;1" dur="12s" repeatCount="indefinite"/>
+      </rect>
+    </clipPath>
+    <clipPath id="outClip">
+      <rect x="0" y="90" width="860" height="374">
+        <animate attributeName="height" calcMode="discrete"
+          values="0;0;0;0;0;22;44;66;88;110;132;154;176;198;220;242;264;286;308;330;352;374;374;374;374;374;374;374;374;374;374;374;374;374;374;374;374;374"
+          dur="12s" repeatCount="indefinite"/>
+      </rect>
+    </clipPath>
+  </defs>
+
+  <!-- window -->
+  <rect x="0" y="0" width="860" height="484" rx="10" fill="#0d1117"/>
+  <path d="M 0 10 A 10 10 0 0 1 10 0 H 850 A 10 10 0 0 1 860 10 V 40 H 0 Z" fill="#161b22"/>
+  <line x1="0" y1="40" x2="860" y2="40" stroke="#30363d" stroke-width="1"/>
+  <circle cx="24" cy="20" r="6" fill="#f0655a"/>
+  <circle cx="46" cy="20" r="6" fill="#e3b341"/>
+  <circle cx="68" cy="20" r="6" fill="#3fb950"/>
+  <text x="430" y="25" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12.5" fill="#7d8590">nightshift demo — offline, no API key, no network</text>
+
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="14">
+
+    <!-- prompt line, typed -->
+    <g clip-path="url(#typeClip)">
+      <text xml:space="preserve" x="30" y="76"><tspan fill="#3fb950">$ </tspan><tspan fill="#e6edf3">nightshift demo</tspan></text>
+    </g>
+    <rect x="174" y="63" width="8" height="16" fill="#58a6ff" opacity="1">
+      <animate attributeName="x" values="30;174;174" keyTimes="0;0.115;1" dur="12s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.5;0.5;1" dur="1.1s" repeatCount="indefinite"/>
+    </rect>
+
+    <!-- output, revealed one line at a time -->
+    <g clip-path="url(#outClip)">
+      <text xml:space="preserve" x="30" y="106"><tspan fill="#3fb950">nightshift run complete</tspan><tspan fill="#6e7681"> in 0.3s</tspan></text>
+      <text xml:space="preserve" x="30" y="128"><tspan fill="#58a6ff">  vault:</tspan><tspan fill="#c9d1d9">     C:\ns\demo-vault</tspan></text>
+      <text xml:space="preserve" x="30" y="150"><tspan fill="#58a6ff">  backend:</tspan><tspan fill="#8b949e">   regex (LLM calls: 0, circuit breaker: closed)</tspan></text>
+      <text xml:space="preserve" x="30" y="172"><tspan fill="#58a6ff">  items:</tspan><tspan fill="#8b949e">     4 collected, 4 processed, 0 skipped, 0 error(s)</tspan></text>
+      <text xml:space="preserve" x="30" y="194"><tspan fill="#58a6ff">  notes:</tspan><tspan fill="#8b949e">     4 sources, 17 tools, 4 ideas, 1 digest</tspan></text>
+      <text xml:space="preserve" x="30" y="216"><tspan fill="#58a6ff">  top signal:</tspan></text>
+      <text xml:space="preserve" x="30" y="238"><tspan fill="#d29922">     83</tspan><tspan fill="#c9d1d9">  Five Prompting Techniques That Actually Work in 2026</tspan></text>
+      <text xml:space="preserve" x="30" y="260"><tspan fill="#d29922">     78</tspan><tspan fill="#c9d1d9">  Building a Local-First Meeting Notes Pipeline</tspan></text>
+      <text xml:space="preserve" x="30" y="282"><tspan fill="#d29922">     75</tspan><tspan fill="#c9d1d9">  rag-in-ten-minutes</tspan></text>
+      <text xml:space="preserve" x="30" y="304"><tspan fill="#d29922">     46</tspan><tspan fill="#c9d1d9">  I Replaced My Whole Agency Workflow With AI Agents</tspan></text>
+      <text xml:space="preserve" x="30" y="326"><tspan fill="#58a6ff">  ideas by profile fit:</tspan></text>
+      <text xml:space="preserve" x="30" y="348"><tspan fill="#d29922">     58</tspan><tspan fill="#3fb950">  worth exploring</tspan><tspan fill="#c9d1d9">  Privacy-first meeting notes appliance for law firms and clinics</tspan></text>
+      <text xml:space="preserve" x="30" y="370"><tspan fill="#d29922">     50</tspan><tspan fill="#3fb950">  worth exploring</tspan><tspan fill="#c9d1d9">  RAG starter kit for internal documentation of small software teams</tspan></text>
+      <text xml:space="preserve" x="30" y="392"><tspan fill="#d29922">     35</tspan><tspan fill="#d29922">  weak fit</tspan><tspan fill="#c9d1d9">         Small prompt library tool for customer support teams</tspan></text>
+      <text xml:space="preserve" x="30" y="414"><tspan fill="#d29922">      5</tspan><tspan fill="#6e7681">  skip</tspan><tspan fill="#8b949e">             Done-for-you agent setup service for small agencies</tspan></text>
+      <text xml:space="preserve" x="30" y="436"><tspan fill="#58a6ff">  digest:</tspan><tspan fill="#8b949e">    Digest/Digest 2026-09-23.md</tspan></text>
+      <text xml:space="preserve" x="30" y="458"><tspan fill="#6e7681">Open C:\ns\demo-vault in Obsidian (or any Markdown editor) to browse the result.</tspan></text>
+    </g>
+  </g>
+
+  <rect x="0.5" y="0.5" width="859" height="483" rx="10" fill="none" stroke="#30363d" stroke-width="1"/>
+</svg>

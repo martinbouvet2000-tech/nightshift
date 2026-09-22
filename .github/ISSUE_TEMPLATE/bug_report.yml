@@ -1,0 +1,95 @@
+name: Bug report
+description: Something in nightshift does not behave the way it says it does.
+title: "bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Please don't file security problems here — see
+        [SECURITY.md](https://github.com/martinbouvet2000-tech/nightshift/blob/main/SECURITY.md).
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part?
+      options:
+        - pipeline/ (Python CLI, sources, extraction, scoring, note writing)
+        - vault/ (writer, audit, fix-links, normalize, backup)
+        - nightly/ (night runner, prompt, schedulers)
+        - Docs or examples
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you expected, and what you got instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: >
+        The exact commands, ideally starting from a clean clone. If you can reproduce it with
+        `nightshift demo` or the sample vault in `vault/test/fixtures/`, say so — that makes it
+        much faster to fix.
+      placeholder: |
+        1. cd pipeline
+        2. nightshift run --sources local --limit 1
+        3. ...
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: output
+    attributes:
+      label: Output
+      description: >
+        Error message, traceback, or the relevant lines. For a night run, the tail of
+        `<vault>/.nightshift/logs/run_<id>.log` is the useful part.
+      render: shell
+
+  - type: input
+    id: version
+    attributes:
+      label: nightshift version or commit
+      placeholder: "0.1.0, or the commit SHA you are on"
+    validations:
+      required: true
+
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      description: OS, plus Python and/or Node version (`python -V`, `node -v`).
+      placeholder: "Windows 11 / Python 3.12.3 / Node 22.4.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: backend
+    attributes:
+      label: Extraction backend in use
+      description: The run summary prints this as `backend:`.
+      options:
+        - "regex (offline)"
+        - "claude CLI"
+        - "Anthropic API"
+        - Not applicable
+        - Not sure
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I ran the relevant test suite (`pytest -q` and/or `node --test vault/test/*.test.mjs nightly/test/*.test.mjs`) and included the result if it is relevant.
+        - label: I searched existing issues.
+        - label: This is not a security vulnerability.
+          required: true

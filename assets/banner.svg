@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-labelledby="t d">
+  <title id="t">nightshift</title>
+  <desc id="d">nightshift — a second brain that works while you sleep. A 24-hour arc with an agent glyph running through the night hours.</desc>
+
+  <defs>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#3b3f9e" stop-opacity="0.38"/>
+      <stop offset="0.55" stop-color="#232a6b" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#0d1117" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowL" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#5a4bd6" stop-opacity="0.20"/>
+      <stop offset="1" stop-color="#0d1117" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="nightArc" gradientUnits="userSpaceOnUse" x1="881" y1="105" x2="1026" y2="144">
+      <stop offset="0" stop-color="#5a6cf0"/>
+      <stop offset="0.5" stop-color="#8b7bf6"/>
+      <stop offset="1" stop-color="#c07bf2"/>
+    </linearGradient>
+    <linearGradient id="word" gradientUnits="userSpaceOnUse" x1="300" y1="110" x2="500" y2="165">
+      <stop offset="0" stop-color="#7c8cf8"/>
+      <stop offset="1" stop-color="#c08cf8"/>
+    </linearGradient>
+    <linearGradient id="rule" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1200" y2="0">
+      <stop offset="0" stop-color="#5a6cf0" stop-opacity="0.9"/>
+      <stop offset="0.45" stop-color="#c07bf2" stop-opacity="0.65"/>
+      <stop offset="1" stop-color="#c07bf2" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- background -->
+  <rect width="1200" height="300" fill="#0d1117"/>
+  <ellipse cx="920" cy="235" rx="470" ry="300" fill="url(#glow)"/>
+  <ellipse cx="180" cy="140" rx="380" ry="260" fill="url(#glowL)"/>
+
+  <!-- stars -->
+  <g fill="#c9d1e8">
+    <circle cx="128" cy="52" r="1.3" opacity="0.55"><animate attributeName="opacity" values="0.55;0.95;0.55" dur="3.4s" repeatCount="indefinite"/></circle>
+    <circle cx="246" cy="36" r="1.0" opacity="0.40"><animate attributeName="opacity" values="0.40;0.85;0.40" dur="4.1s" repeatCount="indefinite"/></circle>
+    <circle cx="358" cy="58" r="1.4" opacity="0.60"><animate attributeName="opacity" values="0.60;0.25;0.60" dur="3.0s" repeatCount="indefinite"/></circle>
+    <circle cx="462" cy="40" r="1.1" opacity="0.45"><animate attributeName="opacity" values="0.45;0.90;0.45" dur="5.0s" repeatCount="indefinite"/></circle>
+    <circle cx="548" cy="74" r="1.2" opacity="0.50"><animate attributeName="opacity" values="0.50;0.20;0.50" dur="3.7s" repeatCount="indefinite"/></circle>
+    <circle cx="614" cy="48" r="1.5" opacity="0.65"><animate attributeName="opacity" values="0.65;0.30;0.65" dur="4.4s" repeatCount="indefinite"/></circle>
+    <circle cx="662" cy="94" r="1.1" opacity="0.42"><animate attributeName="opacity" values="0.42;0.88;0.42" dur="3.2s" repeatCount="indefinite"/></circle>
+    <circle cx="712" cy="62" r="1.0" opacity="0.38"><animate attributeName="opacity" values="0.38;0.80;0.38" dur="4.8s" repeatCount="indefinite"/></circle>
+    <circle cx="756" cy="34" r="1.3" opacity="0.55"><animate attributeName="opacity" values="0.55;0.22;0.55" dur="3.9s" repeatCount="indefinite"/></circle>
+    <circle cx="816" cy="44" r="1.1" opacity="0.46"><animate attributeName="opacity" values="0.46;0.92;0.46" dur="4.6s" repeatCount="indefinite"/></circle>
+    <circle cx="872" cy="30" r="1.0" opacity="0.40"><animate attributeName="opacity" values="0.40;0.82;0.40" dur="3.3s" repeatCount="indefinite"/></circle>
+    <circle cx="920" cy="46" r="1.4" opacity="0.62"><animate attributeName="opacity" values="0.62;0.28;0.62" dur="5.2s" repeatCount="indefinite"/></circle>
+    <circle cx="976" cy="32" r="1.1" opacity="0.44"><animate attributeName="opacity" values="0.44;0.88;0.44" dur="3.6s" repeatCount="indefinite"/></circle>
+    <circle cx="1030" cy="48" r="1.2" opacity="0.50"><animate attributeName="opacity" values="0.50;0.20;0.50" dur="4.2s" repeatCount="indefinite"/></circle>
+    <circle cx="1092" cy="86" r="1.5" opacity="0.62"><animate attributeName="opacity" values="0.62;0.26;0.62" dur="3.1s" repeatCount="indefinite"/></circle>
+    <circle cx="1128" cy="42" r="1.0" opacity="0.38"><animate attributeName="opacity" values="0.38;0.84;0.38" dur="4.9s" repeatCount="indefinite"/></circle>
+    <circle cx="1160" cy="124" r="1.3" opacity="0.52"><animate attributeName="opacity" values="0.52;0.22;0.52" dur="3.5s" repeatCount="indefinite"/></circle>
+    <circle cx="1106" cy="176" r="1.1" opacity="0.44"><animate attributeName="opacity" values="0.44;0.86;0.44" dur="4.3s" repeatCount="indefinite"/></circle>
+    <circle cx="1164" cy="214" r="1.2" opacity="0.48"><animate attributeName="opacity" values="0.48;0.18;0.48" dur="3.8s" repeatCount="indefinite"/></circle>
+  </g>
+
+  <!-- 24-hour arc, centre (920,250) radius 150; left end 12:00, apex 00:00, right end 12:00 -->
+  <g>
+    <line x1="744" y1="250" x2="1096" y2="250" stroke="#21262d" stroke-width="1.5"/>
+    <path d="M 770 250 A 150 150 0 0 1 1070 250" fill="none" stroke="#2b3240" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 881.18 105.11 A 150 150 0 0 1 1026.07 143.93" fill="none" stroke="url(#nightArc)" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 770 250 A 150 150 0 0 1 1070 250" fill="none" stroke="#8b7bf6" stroke-width="2.5" stroke-linecap="round" opacity="0.5" stroke-dasharray="26 445" stroke-dashoffset="0">
+      <animate attributeName="stroke-dashoffset" values="0;-471" dur="7s" repeatCount="indefinite"/>
+    </path>
+
+    <!-- hour ticks: theta -90 (12:00) .. 0 (00:00) .. 90 (12:00), one per hour -->
+    <g stroke="#39414f" stroke-width="1.6" stroke-linecap="round">
+      <line x1="920" y1="100" x2="920" y2="88" stroke="#4a5364" stroke-width="2.2" transform="rotate(-90 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="93" transform="rotate(-82.5 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="93" transform="rotate(-75 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="93" transform="rotate(-67.5 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="93" transform="rotate(-60 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="93" transform="rotate(-52.5 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="88" stroke="#4a5364" stroke-width="2.2" transform="rotate(-45 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="93" transform="rotate(-37.5 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="93" transform="rotate(-30 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="93" transform="rotate(-22.5 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="91" stroke="#8b7bf6" stroke-width="2" transform="rotate(-15 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="91" stroke="#8b7bf6" stroke-width="2" transform="rotate(-7.5 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="86" stroke="#b18cf8" stroke-width="2.4" transform="rotate(0 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="91" stroke="#8b7bf6" stroke-width="2" transform="rotate(7.5 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="91" stroke="#8b7bf6" stroke-width="2" transform="rotate(15 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="91" stroke="#8b7bf6" stroke-width="2" transform="rotate(22.5 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="91" stroke="#8b7bf6" stroke-width="2" transform="rotate(30 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="91" stroke="#8b7bf6" stroke-width="2" transform="rotate(37.5 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="88" stroke="#4a5364" stroke-width="2.2" transform="rotate(45 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="93" transform="rotate(52.5 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="93" transform="rotate(60 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="93" transform="rotate(67.5 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="93" transform="rotate(75 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="93" transform="rotate(82.5 920 250)"/>
+      <line x1="920" y1="100" x2="920" y2="88" stroke="#4a5364" stroke-width="2.2" transform="rotate(90 920 250)"/>
+    </g>
+
+    <!-- hour labels -->
+    <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="12" fill="#6e7681">
+      <text x="762" y="270" text-anchor="middle">12:00</text>
+      <text x="792" y="128" text-anchor="end">18:00</text>
+      <text x="920" y="74" text-anchor="middle" fill="#b18cf8" font-size="13">00:00</text>
+      <text x="1048" y="128" text-anchor="start">06:00</text>
+      <text x="1078" y="270" text-anchor="middle">12:00</text>
+      <text x="920" y="214" text-anchor="middle" fill="#565f6d" font-size="12" letter-spacing="3.5">NIGHT SHIFT</text>
+    </g>
+
+    <!-- agent glyph running through the night hours (22:00 -> 06:00) -->
+    <g transform="rotate(8 920 250)">
+      <animateTransform attributeName="transform" type="rotate"
+        values="-15 920 250;45 920 250;-15 920 250" keyTimes="0;0.5;1"
+        calcMode="spline" keySplines="0.45 0 0.55 1;0.45 0 0.55 1"
+        dur="9s" repeatCount="indefinite"/>
+      <circle cx="920" cy="100" r="14" fill="#7c8cf8" opacity="0.2">
+        <animate attributeName="r" values="12;20;12" dur="2.6s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.28;0.05;0.28" dur="2.6s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="920" cy="100" r="7.5" fill="#0d1117" stroke="#9aa6ff" stroke-width="2.2"/>
+      <circle cx="920" cy="100" r="2.8" fill="#dfe4ff"/>
+    </g>
+  </g>
+
+  <!-- wordmark -->
+  <text x="72" y="158" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="70" font-weight="700" letter-spacing="-1.5">
+    <tspan fill="#e6edf3">night</tspan><tspan fill="url(#word)">shift</tspan>
+  </text>
+  <rect x="74" y="178" width="66" height="3" rx="1.5" fill="url(#word)"/>
+  <text x="72" y="212" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="21" fill="#9aa4b2">A second brain that works while you sleep</text>
+  <text x="72" y="250" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="13.5" fill="#5d6673" letter-spacing="0.4">capture &#8594; transcribe &#8594; extract &#8594; score &#8594; notes &#8594; night shift</text>
+
+  <rect x="0" y="296" width="1200" height="3" fill="url(#rule)"/>
+</svg>

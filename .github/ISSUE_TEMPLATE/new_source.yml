@@ -1,0 +1,107 @@
+name: New source
+description: Propose (or claim) a new content source — podcasts, RSS, read-later exports, anything.
+title: "source: "
+labels: ["enhancement", "source"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is the contribution the project wants most. A `Source` yields `Item` objects; the
+        pipeline does the transcribing, extraction, scoring and note writing.
+
+        Read the walkthrough first:
+        [Adding a new Source](https://github.com/martinbouvet2000-tech/nightshift/blob/main/CONTRIBUTING.md#adding-a-new-source).
+
+  - type: input
+    id: name
+    attributes:
+      label: Source name
+      description: The `name` attribute on the class, used as the config key and in `--sources`.
+      placeholder: "rss"
+    validations:
+      required: true
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What it pulls in
+      description: Where the content comes from, and what a typical item looks like.
+      placeholder: "Podcast episodes from a list of RSS feeds; transcript from the feed's <transcript> tag when present, otherwise the audio enclosure handed to Whisper."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: payload
+    attributes:
+      label: What does an item carry?
+      description: Every yielded `Item` must set one of these.
+      options:
+        - "transcript (text is already available)"
+        - "media_path (audio/video, handed to the transcribe stage)"
+        - "Both, depending on the entry"
+    validations:
+      required: true
+
+  - type: input
+    id: item-id
+    attributes:
+      label: How is the item `id` derived?
+      description: It must be stable across runs, so `state.is_done()` can skip it next time.
+      placeholder: "rss-<sha1 of the entry GUID>[:12]"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: api
+    attributes:
+      label: API status
+      description: >
+        Sources relying on unofficial or scraped APIs will not be merged — that's why the social
+        connectors aren't in this repo.
+      options:
+        - "Official, documented, public API or open format (RSS, OPML, an export file)"
+        - "Official API, requires a user token"
+        - "Unofficial / scraped"
+    validations:
+      required: true
+
+  - type: textarea
+    id: deps
+    attributes:
+      label: Dependencies
+      description: >
+        Anything beyond the standard library must be an optional extra in `pyproject.toml`, and the
+        source must degrade with a clear log line when it isn't installed. "None" is a great answer.
+      placeholder: "None — feedparser avoided, xml.etree is enough."
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Config shape
+      description: What you'd add under the source's key in `config.example.yaml`.
+      render: yaml
+      placeholder: |
+        rss:
+          enabled: true
+          feeds:
+            - https://example.com/feed.xml
+          max_per_feed: 10
+
+  - type: textarea
+    id: testing
+    attributes:
+      label: How it can be tested offline
+      description: CI has no network. Describe the fixture or the mock.
+      placeholder: "A saved feed XML fixture plus a fake fetcher injected through cfg, like test_sources.py does for YouTube."
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: claim
+    attributes:
+      label: Status
+      options:
+        - label: I intend to implement this and open a PR.
+        - label: I've read `CONTRIBUTING.md` and the `Source` ABC in `pipeline/src/nightshift/sources/base.py`.

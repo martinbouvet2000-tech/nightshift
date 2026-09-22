@@ -1,0 +1,71 @@
+name: Feature request
+description: Suggest a capability or a change in behaviour.
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        nightshift is deliberately small: one Python dependency, zero Node dependencies, everything
+        runs locally. Proposals that keep it that way have a much better chance.
+
+        Proposing a **new content source** (podcasts, RSS, read-later)? Use the
+        [New source](https://github.com/martinbouvet2000-tech/nightshift/issues/new?template=new_source.yml)
+        template instead.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What can't you do today? Describe the situation, not the solution.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you'd like
+      description: The behaviour you want. A sample command, config snippet or note is ideal.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part would it touch?
+      multiple: true
+      options:
+        - pipeline/ (Python CLI, sources, extraction, scoring, note writing)
+        - vault/ (writer, audit, fix-links, normalize, backup)
+        - nightly/ (night runner, prompt, schedulers)
+        - The data contract (vault/CONTRACT.md)
+        - Docs or examples
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+      description: Including "do nothing" — say why that isn't enough.
+
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Fit with the project's constraints
+      options:
+        - label: It works offline, or degrades cleanly without a network or an API key.
+        - label: It needs no new required dependency (an optional extra like `youtube` or `whisper` is fine).
+        - label: It respects the data contract in `vault/CONTRACT.md`.
+        - label: It does not require a proprietary or unofficial API.
+
+  - type: dropdown
+    id: help
+    attributes:
+      label: Would you be willing to implement it?
+      options:
+        - "Yes, I'd like to open a PR"
+        - "Maybe, with some guidance"
+        - "No, just suggesting"
+    validations:
+      required: true

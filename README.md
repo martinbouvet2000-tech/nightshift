@@ -1,4 +1,11 @@
-# nightshift
+<img src="assets/banner.svg" alt="nightshift" width="100%">
+
+[![CI](https://github.com/martinbouvet2000-tech/nightshift/actions/workflows/ci.yml/badge.svg)](https://github.com/martinbouvet2000-tech/nightshift/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-2ea043)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab)](pipeline/pyproject.toml)
+[![Node 18+](https://img.shields.io/badge/node-18%2B-5fa04e)](nightly/README.md)
+[![vault + nightly: zero dependencies](https://img.shields.io/badge/vault%20%2B%20nightly-zero%20dependencies-8b7bf6)](vault)
+[![Offline demo: no API key](https://img.shields.io/badge/demo-offline%2C%20no%20API%20key-b06ef2)](#try-it-in-one-minute-no-api-key-no-network)
 
 **A second brain that works while you sleep.**
 
@@ -12,6 +19,10 @@ capture ─► transcribe ─► extract + score ─► write notes ─► night
 
 It's the open-source core of the system I run every day ([case study](https://martinbouvet2000-tech.github.io/work/ai-os.html)). The personal parts are gone. Everything here runs on your machine, and your notes stay plain Markdown.
 
+## Why
+
+Read-it-later apps and AI chat windows both forget. A saved video is a bookmark you never open again; a chat answer disappears when the tab closes. nightshift makes the opposite bet: put everything in plain Markdown files you own, enforce a data contract so the files stay machine-readable, and let an agent work on them while you're asleep. What you get in the morning isn't a feed — it's notes that link to each other, scored against *your* profile, that your other agents can read before they answer you. No lock-in: it's a folder of `.md` files, and you can delete this repo and keep them.
+
 ## Try it in one minute (no API key, no network)
 
 ```bash
@@ -24,15 +35,7 @@ nightshift demo
 
 The demo runs the full pipeline on four bundled sample transcripts with the offline extractor and writes a small vault to `./demo-vault`:
 
-```
-nightshift run complete in 0.6s
-  backend:   regex (LLM calls: 0, circuit breaker: closed)
-  items:     4 collected, 4 processed, 0 skipped, 0 error(s)
-  notes:     4 sources, 17 tools, 4 ideas, 1 digest
-  ideas by profile fit:
-     58  worth exploring  Privacy-first meeting notes appliance for law firms and clinics
-     50  worth exploring  RAG starter kit for internal documentation of small software teams
-```
+<img src="assets/demo.svg" alt="Terminal replay of a real nightshift demo run: 4 items processed offline into 4 source notes, 17 tool notes, 4 scored ideas and 1 digest" width="100%">
 
 Open `demo-vault` in Obsidian, or check it against the data contract:
 
@@ -61,11 +64,20 @@ flowchart LR
   G --> H
 ```
 
-| Part | What it does |
-|---|---|
-| [`pipeline/`](pipeline) | Python package and CLI. Pluggable sources, extraction and scoring stages, contract-safe note writer, offline demo. |
-| [`vault/`](vault) | Zero-dependency Node tools: a contract-aware writer, an auditor, link fixer and normaliser (dry-run by default), and a git backup. |
-| [`nightly/`](nightly) | The night shift: a cross-platform runner around `claude -p` and the consolidation prompt, plus scheduler examples for Task Scheduler, cron and launchd. |
+## Repo map
+
+| Path | What it is | Runtime | Tests |
+|---|---|---|---|
+| [`pipeline/`](pipeline) | Python package and CLI (`run`, `demo`, `health`). Pluggable sources, extraction and scoring stages, contract-safe note writer, offline demo. | Python 3.10+, PyYAML | 70 |
+| [`vault/`](vault) | Node tools: a contract-aware writer, an auditor, a link fixer and a normaliser (dry-run by default), and a git backup. | Node 18+, zero deps | 9 |
+| [`nightly/`](nightly) | The night shift: a cross-platform runner around `claude -p` and the consolidation prompt, plus scheduler examples for Task Scheduler, cron and launchd. | Node 18+, zero deps | 10 |
+| [`vault/CONTRACT.md`](vault/CONTRACT.md) | The data contract every note obeys — enforced by the writer, checked by the auditor. | — | — |
+| [`.github/workflows/ci.yml`](.github/workflows/ci.yml) | Both suites plus the offline demo, on Ubuntu and Windows. | — | — |
+
+```bash
+cd pipeline && pytest -q                                      # 70 tests
+node --test vault/test/*.test.mjs nightly/test/*.test.mjs     # 19 tests
+```
 
 ## Design decisions
 
@@ -92,6 +104,8 @@ Transcripts come from the internet, so treat them as untrusted input: a video co
 - The API key is read from the environment only, and it's never sent to a non-`https://` base URL.
 - Review what the agent changed (`git diff` in your vault) before you rely on it, at least for the first nights.
 
+The full policy, including what is in and out of scope and how to report a problem privately, is in [SECURITY.md](SECURITY.md).
+
 ## Status and limits
 
 This is v0.1, extracted from a personal system that has been running daily, not a polished product.
@@ -103,6 +117,21 @@ This is v0.1, extracted from a personal system that has been running daily, not 
 - Social-network connectors aren't included: they rely on unofficial APIs.
 
 Issues and pull requests are welcome, especially new `Source` implementations (podcasts, RSS, read-later exports).
+
+## Roadmap
+
+Ideas, not promises, and not in any order. Nothing here is scheduled, and I'd rather merge a good PR than build all of it myself. Each item maps to a limitation above.
+
+- **More sources.** Podcasts (RSS with a transcript tag, audio through Whisper otherwise), plain RSS/Atom, and read-later exports (Pocket, Instapaper, Readwise). The `Source` interface exists for exactly this — see [Adding a new Source](CONTRIBUTING.md#adding-a-new-source). Official APIs and open formats only.
+- **Semantic idea scoring.** Profile fit is keyword matching today. Local embeddings would rank ideas by meaning instead of by vocabulary, without sending anything anywhere.
+- **Real-run coverage for the night runner.** The runner is well tested against a mocked `claude`; the prompt itself has only ever run in my setup. A reproducible end-to-end harness on a throwaway vault would turn that caveat into a test.
+- **Packaging to PyPI.** `pip install nightshift` instead of a clone and an editable install. Blocked on nothing but a naming check and a release workflow.
+
+If one of these matters to you, say so in an issue — that is the only prioritisation signal there is.
+
+## Contributing
+
+[CONTRIBUTING.md](CONTRIBUTING.md) has the dev setup for both halves, how to run the suites, and a walkthrough for adding a `Source`. By participating you agree to the [Code of Conduct](CODE_OF_CONDUCT.md). Release notes live in [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
