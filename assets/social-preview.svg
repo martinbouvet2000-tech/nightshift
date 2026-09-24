@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640">
+<defs><pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#252A31" stroke-opacity=".5"/></pattern></defs>
+<rect width="1280" height="640" fill="#0B0D10"/>
+<rect width="1280" height="640" fill="url(#g)"/>
+<rect x="0" y="0" width="1280" height="6" fill="#F0883E"/>
+<text x="80" y="150" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="15" fill="#F0883E" letter-spacing="3.5">OPEN SOURCE · PYTHON + NODE</text>
+<text x="76" y="250" font-family="-apple-system,'Segoe UI',Inter,Helvetica,Arial,sans-serif" font-size="82" font-weight="700" fill="#F5F7FA" letter-spacing="-2">nightshift</text>
+<text x="80" y="308" font-family="-apple-system,'Segoe UI',Inter,Helvetica,Arial,sans-serif" font-size="31" fill="#8B949E">A second brain that works while you sleep.</text>
+<line x1="80" y1="358" x2="860" y2="358" stroke="#252A31"/>
+<text x="80" y="422" font-family="-apple-system,'Segoe UI',Inter,Helvetica,Arial,sans-serif" font-size="42" font-weight="700" fill="#F5F7FA">89</text>
+<text x="80" y="450" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="13" fill="#8B949E">tests</text>
+<text x="280" y="422" font-family="-apple-system,'Segoe UI',Inter,Helvetica,Arial,sans-serif" font-size="42" font-weight="700" fill="#F5F7FA">2</text>
+<text x="280" y="450" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="13" fill="#8B949E">operating systems in CI</text>
+<text x="480" y="422" font-family="-apple-system,'Segoe UI',Inter,Helvetica,Arial,sans-serif" font-size="42" font-weight="700" fill="#F5F7FA">0</text>
+<text x="480" y="450" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="13" fill="#8B949E">API keys to try it</text>
+<text x="80" y="536" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="16" fill="#4A515B">$ <tspan fill="#F5F7FA">nightshift demo</tspan><tspan fill="#4A515B">   # offline, no key, under a minute</tspan></text>
+<text x="80" y="578" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="14" fill="#8B949E">github.com/martinbouvet2000-tech/nightshift</text>
+<g transform="translate(1075,320)"><path d="M0 -120 A120 120 0 0 1 85 85" fill="none" stroke="#F5F7FA" stroke-opacity=".05" stroke-width="38"/><circle r="120" fill="none" stroke="#252A31"/><line x1="0.0" y1="-120.0" x2="0.0" y2="-132.0" stroke="#8B949E"/><text x="0.0" y="-147.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="14" fill="#8B949E">00</text><line x1="120.0" y1="0.0" x2="132.0" y2="0.0" stroke="#8B949E"/><text x="152.0" y="5.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="14" fill="#8B949E">06</text><line x1="0.0" y1="120.0" x2="0.0" y2="132.0" stroke="#8B949E"/><text x="0.0" y="157.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="14" fill="#8B949E">12</text><line x1="-120.0" y1="0.0" x2="-132.0" y2="0.0" stroke="#8B949E"/><text x="-152.0" y="5.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="14" fill="#8B949E">18</text><circle cx="-8" cy="-100" r="6" fill="#F0883E"/><circle cx="74" cy="-71" r="6" fill="#F0883E"/><circle cx="100" cy="11" r="6" fill="#F0883E"/><circle cx="-100" cy="9" r="6" fill="#F0883E"/><line x1="0" y1="0" x2="-60" y2="-60" stroke="#F5F7FA" stroke-width="3" stroke-linecap="round"/><circle r="5" fill="#F5F7FA"/><text y="205" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="13" fill="#4A515B" letter-spacing="2">00:30 · EVERY DAY</text></g>
+</svg>
