@@ -12,12 +12,13 @@ reporting lives.
 
 ## The system, briefly
 
-A scheduled task fires at 00:30 and runs a Node wrapper around `claude -p`. The
-agent reads the last 24 hours of a Markdown vault, consolidates it, and must
-finish by printing a proof line. The wrapper enforces a time window, a lock, a
+A Windows scheduled task fires at 00:30 and runs a wrapper around `claude -p`.
+The agent reads a 36-hour window of a Markdown vault, consolidates it, and must
+finish by printing a proof line. The wrapper enforces that window, a lock, a
 timeout and one retry, appends a health block to the day's journal, and updates
-a `state.json`. Four other jobs run on a schedule around it — two capture runs,
-a backup, a profile rebuild.
+a `state.json`. The task itself is set to wake the machine and to catch up after
+a missed start — that turns out to matter, and not enough. Four other jobs run
+on a schedule around it: two capture runs, a backup, a profile rebuild.
 
 You do not need my vault to read the rest. The shape is what matters: a
 scheduled process on a personal machine, driving an LLM CLI, writing files, and
@@ -135,12 +136,48 @@ Ten of the 37 nights have no log file at all:
 2026-09-05  2026-09-06  2026-09-12  2026-09-19  2026-09-20
 ```
 
-Nothing to catch, nothing to log, nothing to retry. The scheduler did not fail.
-The machine was not running at 00:30. A laptop with a closed lid executes no
-code, including all the code I wrote to tell me when my code does not execute.
+No log file is a strong claim here, because the runner opens its log on line 34,
+before every guard it has — before the maintenance lock, before the window
+calculation, before anything that could make it exit early. A run that started
+and immediately decided to do nothing still leaves a file. So an absent file
+means the process never started.
 
-Twenty-seven percent of the sample. This is the largest single failure class,
-and it is the one the system is most completely blind to.
+**The obvious objection is already handled, and it was not enough.** The
+scheduled task is configured the way you would configure it:
+
+```
+WakeToRun          : True     # wake the machine for this
+StartWhenAvailable : True     # run it late if the start was missed
+DisallowStartIfOnBatteries : False
+Triggers           : daily 00:30  +  at logon
+```
+
+That catch-up is not theoretical. Eleven of the thirty runs fired outside the
+00:00–01:30 window — at 09:18, 10:05, 11:45, 16:19, 04:11. Those are the
+scheduler recovering missed starts, and they worked.
+
+It still lost ten nights, because `WakeToRun` wakes a sleeping machine and a
+shut-down one has nothing listening, and because catch-up can only run once the
+machine comes back — which, across a four-day gap, is too late to be the same
+night.
+
+**How much was actually lost is smaller than ten.** The runner consolidates a
+36-hour window, not a calendar day, so a single missed night is usually absorbed
+by the next run. Checking each dark night against the `since=` value of the next
+successful run:
+
+| | Nights |
+|---|---|
+| Absorbed by the next run's 36h window | 3 |
+| Outside the window — genuinely lost | 3 |
+| Indeterminate (pre-rewrite logs record no `since`) | 4 |
+
+The three genuine losses are consecutive: 2026-09-03, 09-05 and 09-06, closed by
+a run on 09-07 whose window only reached back to 09-06 04:19. One dark night is
+an inconvenience. Four in five days is a hole.
+
+So: 27% of nights produced no report, and at least 8% lost data outright. The
+first number is what the system was blind to. The second is what it cost.
 
 ## The blind spot, named
 
@@ -199,6 +236,11 @@ Nights, which is what I actually care about:
 | Attempted, delivered nothing | 5 | 14% |
 | Never started | 10 | 27% |
 
+Of the 15 nights with no report, 3 were absorbed by a later run's 36-hour
+window, 3 lost data outright, and 9 are indeterminate — 4 because the
+pre-rewrite logs do not record their window, 5 because a run that produced no
+report also left no record of what it would have covered.
+
 Runs, which is where the failure modes are visible:
 
 | | Runs |
@@ -221,17 +263,25 @@ one of those was a silent no-op, 59% is generous.
 
 ## What fixes what
 
-| Failure class | Fixable in software? | By what |
+| Failure class | Fixable where you already are? | By what |
 |---|---|---|
-| Lying return value | Yes | Confirm the effect at the source of truth |
-| Failure during the run | Yes | Lock, timeout, retry, proof line |
+| Lying return value | Yes, in the code | Confirm the effect at the source of truth |
+| Failure during the run | Yes, in the code | Lock, timeout, retry, proof line |
 | Process killed mid-run | **No** | Nothing in-process survives it |
-| Night never started | **No** | Not a reliability problem |
+| Night never started | **Partly**, one layer down | Wake-to-run, catch-up, a wide enough window |
 
-The top half of that table is where I spent my effort, and it was not wasted —
-those mechanisms work, and they are why the 22 good nights are trustworthy
-rather than merely uncontradicted. But they address 3 nights out of the 15 that
-went wrong. The other 12 are not bugs. They are the machine not being there.
+That last row is the one worth being precise about, because it is where the
+easy answer lives and the easy answer is already in place. Wake-to-run, catch-up
+and a 36-hour window are real mitigations: they fired on 11 of 30 runs and
+absorbed 3 of the 10 missed nights. They are worth having, and if you take one
+practical thing from this document, make it *check those three settings on your
+own scheduled job.*
+
+They also have a ceiling. Waking works from sleep, not from off. Catch-up runs
+whenever the machine returns, which may be nowhere near the night it owed you.
+A window sized for one missed night does not span four. Each of those is a
+property of the machine's power state, not of the schedule — which is why the
+mitigation is one layer down from the code, and still not far enough down.
 
 ## The part that is not a software problem
 
@@ -240,8 +290,11 @@ given that it runs, does it do the right thing. Mine does, as far as I can
 measure — 23 of 30 runs succeeded, and the 3 that failed failed legibly.
 
 What I was actually measuring is **availability**, and availability is a
-property of the host. No amount of retry logic moves it, because retry logic
-needs a running process, and the whole failure mode is that there is no process.
+property of the host. Retry logic cannot move it, because retry logic needs a
+running process and the failure is that there is no process. The scheduler can
+move it a little, and does. But every lever at that layer is still asking a
+machine that is switched off to do something, and the answer to that is always
+going to be the same.
 
 The conclusion I draw from my own data is not "write better error handling". It
 is that the always-on parts of this system are running on a machine that is not
@@ -268,10 +321,18 @@ the reason the others miss is my laptop.
 
 One machine, one operating system, one user, 37 nights. The method is
 reproducible; the sample is not a study. The pre-2026-09-07 classification is
-weaker than the rest, as noted above. I have no data on what fraction of the ten
-dark nights were sleep versus shutdown versus a machine that was awake but
-without network, because — consistent with everything above — nothing was
-running to record it.
+weaker than the rest, as noted above, and the same gap makes 4 of the 10 dark
+nights impossible to test for window recovery.
+
+I cannot say which of the dark nights were shutdown rather than hibernation, and
+I have not tested whether `WakeToRun` behaves the same under Windows' modern
+standby as under classic S3 sleep — both would change how much of the 27% is
+addressable at the scheduler layer. Nothing was running to record any of it,
+which is the document's own point turned back on its author.
+
+What I have not done is the obvious next experiment: move the capture jobs to a
+host that stays on and measure the same 37 nights again. Until that number
+exists, the case for the move rests on the mechanism, not on a comparison.
 
 ---
 
