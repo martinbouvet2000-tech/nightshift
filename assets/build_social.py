@@ -17,7 +17,11 @@ T = {
     "sans": "-apple-system,'Segoe UI',Inter,Helvetica,Arial,sans-serif",
     "mono": "ui-monospace,SFMono-Regular,Consolas,monospace",
 }
-FACTS = [("115", "tests"), ("3", "platforms in CI"), ("0", "API keys to try it")]
+# "platforms" was wrong: ci.yml runs two OS and docker.yml one more job, all on
+# Linux. Three CI targets is what is actually true, so that is what it says. The
+# CI fact goes last because naming the three targets needs the width.
+FACTS = [("115", "tests"), ("0", "API keys to try it"),
+         ("3", "CI targets: linux, windows, docker")]
 
 
 def clock():

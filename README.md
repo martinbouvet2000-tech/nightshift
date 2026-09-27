@@ -73,7 +73,9 @@ flowchart LR
 | [`nightly/`](nightly) | The night shift: a cross-platform runner around `claude -p` and the consolidation prompt, plus scheduler examples for Task Scheduler, cron and launchd. | Node 18+, zero deps | 10 |
 | [`vault/CONTRACT.md`](vault/CONTRACT.md) | The data contract every note obeys — enforced by the writer, checked by the auditor. | — | — |
 | [`docker/`](docker) | Images for the pipeline and the vault tools, plus [`docker-compose.yml`](docker-compose.yml) — for a NAS or any box that stays on. Published to `ghcr.io/martinbouvet2000-tech/nightshift{,-vault}`. | Docker | built + demo run in CI |
-| [`.github/workflows/ci.yml`](.github/workflows/ci.yml) | Both suites plus the offline demo, on Ubuntu and Windows. | — | — |
+| [`assets/`](assets) | The images in this README. [`build_demo.py`](assets/build_demo.py) runs the demo in a throwaway directory and draws what it counted; [`build_social.py`](assets/build_social.py) draws the share card. | Python 3.10+ | — |
+| [`.github/workflows/ci.yml`](.github/workflows/ci.yml) | Both suites plus the offline demo, on Ubuntu and Windows, against the oldest supported runtimes (Python 3.10, Node 18) as well as the current ones. | — | — |
+| [`.github/workflows/docker.yml`](.github/workflows/docker.yml) | The third CI target: builds both images, runs the demo *inside* the container, and publishes to GHCR from `main` and tags. | — | — |
 
 ```bash
 cd pipeline && pytest -q                                      # 91 tests
