@@ -68,7 +68,7 @@ flowchart LR
 
 | Path | What it is | Runtime | Tests |
 |---|---|---|---|
-| [`pipeline/`](pipeline) | Python package and CLI (`run`, `demo`, `health`). Pluggable sources, extraction and scoring stages, contract-safe note writer, a scheduler for boxes without cron, offline demo. | Python 3.10+, PyYAML | 85 |
+| [`pipeline/`](pipeline) | Python package and CLI (`run`, `demo`, `health`). Pluggable sources, extraction and scoring stages, contract-safe note writer, a scheduler for boxes without cron, offline demo. | Python 3.10+, PyYAML | 91 |
 | [`vault/`](vault) | Node tools: a contract-aware writer, an auditor, a link fixer and a normaliser (dry-run by default), and a git backup, behind one entry point. | Node 18+, zero deps | 14 |
 | [`nightly/`](nightly) | The night shift: a cross-platform runner around `claude -p` and the consolidation prompt, plus scheduler examples for Task Scheduler, cron and launchd. | Node 18+, zero deps | 10 |
 | [`vault/CONTRACT.md`](vault/CONTRACT.md) | The data contract every note obeys — enforced by the writer, checked by the auditor. | — | — |
@@ -76,7 +76,7 @@ flowchart LR
 | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) | Both suites plus the offline demo, on Ubuntu and Windows. | — | — |
 
 ```bash
-cd pipeline && pytest -q                                      # 85 tests
+cd pipeline && pytest -q                                      # 91 tests
 node --test vault/test/*.test.mjs nightly/test/*.test.mjs     # 24 tests
 ```
 

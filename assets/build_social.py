@@ -17,7 +17,7 @@ T = {
     "sans": "-apple-system,'Segoe UI',Inter,Helvetica,Arial,sans-serif",
     "mono": "ui-monospace,SFMono-Regular,Consolas,monospace",
 }
-FACTS = [("109", "tests"), ("3", "platforms in CI"), ("0", "API keys to try it")]
+FACTS = [("115", "tests"), ("3", "platforms in CI"), ("0", "API keys to try it")]
 
 
 def clock():

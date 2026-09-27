@@ -7,7 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Nothing yet. See the [Roadmap](README.md#roadmap) for what is being considered.
+### Added
+
+- Docker support: `docker/Dockerfile` (pipeline) and `docker/Dockerfile.vault` (vault tools),
+  a `docker-compose.yml` with a scheduler inside the container, and a `docker` workflow that
+  runs the offline demo *inside* the built image against a mounted volume.
+- Both images are published to GHCR on every push to `main` — `ghcr.io/martinbouvet2000-tech/nightshift`
+  and `ghcr.io/martinbouvet2000-tech/nightshift-vault`, tagged `latest`, and with the version on a
+  `v*` tag. Nothing is pushed from a pull request.
+
+### Changed
+
+- The suites have grown since 0.1.0: pipeline 70 → 91 (`pytest -q`), vault + nightly 19 → 24
+  (`node --test`). Published counts corrected to match.
+
+See the [Roadmap](README.md#roadmap) for what is being considered next.
 
 ## [0.1.0] - 2026-09-22
 
