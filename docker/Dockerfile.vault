@@ -3,6 +3,10 @@
 #   docker compose run --rm vault-tools audit --strict
 FROM node:20-alpine
 
+LABEL org.opencontainers.image.source="https://github.com/martinbouvet2000-tech/nightshift" \
+      org.opencontainers.image.description="nightshift vault tools" \
+      org.opencontainers.image.licenses="MIT"
+
 ENV NIGHTSHIFT_VAULT=/vault \
     TZ=Europe/Paris
 

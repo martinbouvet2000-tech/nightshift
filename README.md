@@ -72,7 +72,7 @@ flowchart LR
 | [`vault/`](vault) | Node tools: a contract-aware writer, an auditor, a link fixer and a normaliser (dry-run by default), and a git backup, behind one entry point. | Node 18+, zero deps | 14 |
 | [`nightly/`](nightly) | The night shift: a cross-platform runner around `claude -p` and the consolidation prompt, plus scheduler examples for Task Scheduler, cron and launchd. | Node 18+, zero deps | 10 |
 | [`vault/CONTRACT.md`](vault/CONTRACT.md) | The data contract every note obeys — enforced by the writer, checked by the auditor. | — | — |
-| [`docker/`](docker) | Images for the pipeline and the vault tools, plus [`docker-compose.yml`](docker-compose.yml) — for a NAS or any box that stays on. | Docker | built in CI |
+| [`docker/`](docker) | Images for the pipeline and the vault tools, plus [`docker-compose.yml`](docker-compose.yml) — for a NAS or any box that stays on. Published to `ghcr.io/martinbouvet2000-tech/nightshift{,-vault}`. | Docker | built + demo run in CI |
 | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) | Both suites plus the offline demo, on Ubuntu and Windows. | — | — |
 
 ```bash
@@ -109,6 +109,18 @@ VAULT_PATH=/volume1/obsidian docker compose up -d
 docker compose logs -f nightshift
 ```
 
+No clone needed if you only want to run it — both images are published to GHCR
+on every push to `main`, and tagged with the version on a release tag:
+
+```bash
+docker pull ghcr.io/martinbouvet2000-tech/nightshift
+docker pull ghcr.io/martinbouvet2000-tech/nightshift-vault
+```
+
+`docker-compose.yml` builds from source, because that is what someone reading
+the code wants. To run the published images instead, point the two `image:`
+keys at the tags above and delete the `build:` blocks.
+
 The vault is a bind mount, so your notes stay ordinary files on the host: open
 them in Obsidian, back them up, delete this stack, nothing is lost.
 
@@ -136,7 +148,8 @@ parts that genuinely want to be always-on — are what moves to the NAS.
 
 Both images are built on every push, and CI runs the offline demo *inside* the
 container against a mounted volume, so a broken image fails before it is
-described as working.
+described as working. Only then are they pushed to GHCR — a pull request builds
+and tests the images but publishes nothing.
 
 ## Threat model
 

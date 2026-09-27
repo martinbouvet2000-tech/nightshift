@@ -2,6 +2,12 @@
 # Build from the repository root:  docker build -f docker/Dockerfile -t nightshift .
 FROM python:3.12-slim
 
+# Without this, the published package has no link back to the code that built
+# it, and the only way to read the Dockerfile is to already know the repo.
+LABEL org.opencontainers.image.source="https://github.com/martinbouvet2000-tech/nightshift" \
+      org.opencontainers.image.description="nightshift capture pipeline" \
+      org.opencontainers.image.licenses="MIT"
+
 # yt-dlp needs no system package; ffmpeg is only required when you enable the
 # whisper extra, which this image deliberately leaves out — it would pull in
 # torch and multiply the image size for a feature most deployments never use.
