@@ -7,10 +7,10 @@
 <text x="76" y="250" font-family="-apple-system,'Segoe UI',Inter,Helvetica,Arial,sans-serif" font-size="82" font-weight="700" fill="#F5F7FA" letter-spacing="-2">nightshift</text>
 <text x="80" y="308" font-family="-apple-system,'Segoe UI',Inter,Helvetica,Arial,sans-serif" font-size="31" fill="#8B949E">A second brain that works while you sleep.</text>
 <line x1="80" y1="358" x2="860" y2="358" stroke="#252A31"/>
-<text x="80" y="422" font-family="-apple-system,'Segoe UI',Inter,Helvetica,Arial,sans-serif" font-size="42" font-weight="700" fill="#F5F7FA">89</text>
+<text x="80" y="422" font-family="-apple-system,'Segoe UI',Inter,Helvetica,Arial,sans-serif" font-size="42" font-weight="700" fill="#F5F7FA">109</text>
 <text x="80" y="450" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="13" fill="#8B949E">tests</text>
-<text x="280" y="422" font-family="-apple-system,'Segoe UI',Inter,Helvetica,Arial,sans-serif" font-size="42" font-weight="700" fill="#F5F7FA">2</text>
-<text x="280" y="450" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="13" fill="#8B949E">operating systems in CI</text>
+<text x="280" y="422" font-family="-apple-system,'Segoe UI',Inter,Helvetica,Arial,sans-serif" font-size="42" font-weight="700" fill="#F5F7FA">3</text>
+<text x="280" y="450" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="13" fill="#8B949E">platforms in CI</text>
 <text x="480" y="422" font-family="-apple-system,'Segoe UI',Inter,Helvetica,Arial,sans-serif" font-size="42" font-weight="700" fill="#F5F7FA">0</text>
 <text x="480" y="450" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="13" fill="#8B949E">API keys to try it</text>
 <text x="80" y="536" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="16" fill="#4A515B">$ <tspan fill="#F5F7FA">nightshift demo</tspan><tspan fill="#4A515B">   # offline, no key, under a minute</tspan></text>
