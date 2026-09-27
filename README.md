@@ -68,15 +68,16 @@ flowchart LR
 
 | Path | What it is | Runtime | Tests |
 |---|---|---|---|
-| [`pipeline/`](pipeline) | Python package and CLI (`run`, `demo`, `health`). Pluggable sources, extraction and scoring stages, contract-safe note writer, offline demo. | Python 3.10+, PyYAML | 70 |
-| [`vault/`](vault) | Node tools: a contract-aware writer, an auditor, a link fixer and a normaliser (dry-run by default), and a git backup. | Node 18+, zero deps | 9 |
+| [`pipeline/`](pipeline) | Python package and CLI (`run`, `demo`, `health`). Pluggable sources, extraction and scoring stages, contract-safe note writer, a scheduler for boxes without cron, offline demo. | Python 3.10+, PyYAML | 85 |
+| [`vault/`](vault) | Node tools: a contract-aware writer, an auditor, a link fixer and a normaliser (dry-run by default), and a git backup, behind one entry point. | Node 18+, zero deps | 14 |
 | [`nightly/`](nightly) | The night shift: a cross-platform runner around `claude -p` and the consolidation prompt, plus scheduler examples for Task Scheduler, cron and launchd. | Node 18+, zero deps | 10 |
 | [`vault/CONTRACT.md`](vault/CONTRACT.md) | The data contract every note obeys — enforced by the writer, checked by the auditor. | — | — |
+| [`docker/`](docker) | Images for the pipeline and the vault tools, plus [`docker-compose.yml`](docker-compose.yml) — for a NAS or any box that stays on. | Docker | built in CI |
 | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) | Both suites plus the offline demo, on Ubuntu and Windows. | — | — |
 
 ```bash
-cd pipeline && pytest -q                                      # 70 tests
-node --test vault/test/*.test.mjs nightly/test/*.test.mjs     # 19 tests
+cd pipeline && pytest -q                                      # 85 tests
+node --test vault/test/*.test.mjs nightly/test/*.test.mjs     # 24 tests
 ```
 
 ## Design decisions
@@ -94,6 +95,48 @@ node --test vault/test/*.test.mjs nightly/test/*.test.mjs     # 19 tests
 2. **Run it:** `nightshift run`, or `nightshift run --sources local --limit 5` to start small. `nightshift health` checks your setup.
 3. **Add the night shift.** You need [Claude Code](https://claude.com/claude-code). Try `node nightly/runner.mjs --dry-run --vault <your vault>`, then schedule it with one of the examples in [`nightly/schedule/`](nightly/schedule).
 4. **Back up.** If your vault is a git repo, `node vault/backup.mjs --vault <your vault>` commits and pushes it. Schedule it too.
+
+## Run it on a NAS
+
+A laptop is the wrong host for this. The capture runs are scheduled, the night
+agent runs at 00:30, and a closed lid means a night that never happened — the
+terminal on my profile says `no run for N days` often enough to prove it. A box
+that stays on solves that, and it already sits next to the notes.
+
+```bash
+cp pipeline/config.example.yaml config/nightshift.yaml   # then edit it
+VAULT_PATH=/volume1/obsidian docker compose up -d
+docker compose logs -f nightshift
+```
+
+The vault is a bind mount, so your notes stay ordinary files on the host: open
+them in Obsidian, back them up, delete this stack, nothing is lost.
+
+| | |
+|---|---|
+| Schedule | `RUN_AT=09:00,21:00` — a scheduler inside the container, because a NAS has no cron and `restart: unless-stopped` is not a schedule |
+| Vault | `VAULT_PATH=/volume1/…`, bind-mounted read-write |
+| Config | `./config` mounted read-only |
+| Extraction | works with no API key at all, on the offline extractor; set `ANTHROPIC_API_KEY` to use the API instead |
+| User | uid 1000, never root, so the host keeps ownership of its own notes |
+| Limits | 1.5 CPU, 1 GB — a capture run must not disturb what the NAS is actually for |
+| Health | `nightshift health`, so a dashboard shows a broken config instead of a green box doing nothing |
+
+One-shot maintenance, on the same vault:
+
+```bash
+docker compose run --rm vault-tools audit --strict
+docker compose run --rm vault-tools fix-links --dry-run
+```
+
+The night agent is deliberately **not** in these images: it drives the `claude`
+CLI and needs your credentials, which do not belong in a container that restarts
+unattended. It stays on a machine you log into. Capture and maintenance — the
+parts that genuinely want to be always-on — are what moves to the NAS.
+
+Both images are built on every push, and CI runs the offline demo *inside* the
+container against a mounted volume, so a broken image fails before it is
+described as working.
 
 ## Threat model
 

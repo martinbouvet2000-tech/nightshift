@@ -1,0 +1,17 @@
+# The vault tools: audit, link repair, normalisation, backup. Zero dependencies,
+# so the image is Node and four scripts. Meant to be run one shot, not kept up:
+#   docker compose run --rm vault-tools audit --strict
+FROM node:20-alpine
+
+ENV NIGHTSHIFT_VAULT=/vault \
+    TZ=Europe/Paris
+
+WORKDIR /app
+COPY vault/ /app/vault/
+
+# node:20-alpine already ships a uid 1000 "node" user.
+RUN mkdir -p /vault && chown -R node:node /vault /app
+USER node
+
+ENTRYPOINT ["node", "/app/vault/entry.mjs"]
+CMD ["audit"]

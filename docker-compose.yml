@@ -1,0 +1,49 @@
+# nightshift on a NAS, a home server or any box that stays on.
+#
+#   cp pipeline/config.example.yaml config/nightshift.yaml   # then edit it
+#   docker compose up -d
+#   docker compose logs -f nightshift
+#
+# The vault is a bind mount so your notes stay ordinary files on the host: you
+# can open them in Obsidian, back them up and delete this stack without losing
+# anything.
+
+services:
+  nightshift:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: nightshift:local
+    container_name: nightshift
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Europe/Paris}
+      # Set this only if you want the Anthropic API as the extraction backend.
+      # Left empty, the pipeline falls back to its offline regex extractor and
+      # still produces notes.
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    volumes:
+      - ${VAULT_PATH:-./vault-data}:/vault
+      - ./config:/config:ro
+    command: ["--at", "${RUN_AT:-09:00,21:00}", "--", "nightshift", "run"]
+    # A capture run is IO-bound and short. These caps keep it from disturbing
+    # whatever else the NAS is doing — usually serving files.
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 1g
+
+  # One shot, never started by `up`:
+  #   docker compose run --rm vault-tools audit --strict
+  #   docker compose run --rm vault-tools fix-links --dry-run
+  vault-tools:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.vault
+    image: nightshift-vault:local
+    profiles: ["tools"]
+    environment:
+      TZ: ${TZ:-Europe/Paris}
+    volumes:
+      - ${VAULT_PATH:-./vault-data}:/vault

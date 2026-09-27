@@ -1,0 +1,69 @@
+name: docker
+
+# Building the images is not enough: an image that builds and then fails on
+# first contact with a vault is worse than no image. Both are exercised here,
+# and the pipeline one runs the offline demo end to end inside the container.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - docker/**
+      - docker-compose.yml
+      - .dockerignore
+      - pipeline/**
+      - vault/**
+      - .github/workflows/docker.yml
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the pipeline image
+        run: docker build -f docker/Dockerfile -t nightshift:ci .
+
+      - name: Run the offline demo inside the container
+        run: |
+          mkdir -p /tmp/vault
+          docker run --rm \
+            -e NIGHTSHIFT_VAULT=/vault \
+            -v /tmp/vault:/vault \
+            --entrypoint nightshift \
+            nightshift:ci demo
+
+      - name: The demo must have written notes to the mounted vault
+        run: |
+          count=$(find /tmp/vault -name '*.md' | wc -l)
+          echo "$count markdown notes written"
+          test "$count" -gt 0
+
+      - name: The container must not run as root
+        run: |
+          user=$(docker run --rm --entrypoint id nightshift:ci -un)
+          echo "container user: $user"
+          test "$user" = "nightshift"
+
+      - name: Build the vault-tools image
+        run: docker build -f docker/Dockerfile.vault -t nightshift-vault:ci .
+
+      - name: Audit the vault the demo just produced
+        # Findings are expected on a freshly generated vault, so any exit code
+        # is fine here — what must not happen is the tool failing to start.
+        run: docker run --rm -v /tmp/vault:/vault nightshift-vault:ci audit || true
+
+      - name: An unknown subcommand must fail, not silently do nothing
+        run: |
+          if docker run --rm -v /tmp/vault:/vault nightshift-vault:ci nope; then
+            echo "expected a non-zero exit for an unknown command"
+            exit 1
+          fi
+
+      - name: The compose file must be valid
+        run: docker compose config --quiet

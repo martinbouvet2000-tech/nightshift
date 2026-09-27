@@ -30,3 +30,8 @@ demo-vault/
 # OS
 .DS_Store
 Thumbs.db
+
+# Local Docker deployment
+config/nightshift.yaml
+config/profile.yaml
+vault-data/

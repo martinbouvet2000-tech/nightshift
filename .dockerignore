@@ -1,0 +1,13 @@
+.git
+.github
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/node_modules
+**/*.egg-info
+assets
+docs
+vault-data
+config/nightshift.yaml
+*.md
+!pipeline/README.md
