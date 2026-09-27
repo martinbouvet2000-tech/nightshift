@@ -3,22 +3,22 @@ name: docker
 # Building the images is not enough: an image that builds and then fails on
 # first contact with a vault is worse than no image. Both are exercised here,
 # and the pipeline one runs the offline demo end to end inside the container.
+# Only once those pass does `publish` push them to GHCR, and only from main or a
+# tag — never from a pull request.
 
 on:
   push:
     branches: [main]
-    paths:
-      - docker/**
-      - docker-compose.yml
-      - .dockerignore
-      - pipeline/**
-      - vault/**
-      - .github/workflows/docker.yml
+    tags: ["v*"]
   pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
+
+env:
+  PIPELINE_IMAGE: ghcr.io/${{ github.repository_owner }}/nightshift
+  VAULT_IMAGE: ghcr.io/${{ github.repository_owner }}/nightshift-vault
 
 jobs:
   images:
@@ -68,3 +68,57 @@ jobs:
 
       - name: The compose file must be valid
         run: docker compose config --quiet
+
+  # Publishing is a separate job so that the only step with write access to the
+  # registry is the one that needs it, and so that nothing is ever pushed from a
+  # pull request — a fork could otherwise overwrite the image people pull.
+  publish:
+    needs: images
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Work out the tags for this ref
+        # main publishes `latest`; a git tag publishes that version and nothing
+        # else, so an old release can never be republished over `latest`.
+        id: image_tags
+        run: |
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            version="$GITHUB_REF_NAME"
+          else
+            version="latest"
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "pipeline=$PIPELINE_IMAGE:$version" >> "$GITHUB_OUTPUT"
+          echo "vault=$VAULT_IMAGE:$version" >> "$GITHUB_OUTPUT"
+          echo "publishing $PIPELINE_IMAGE:$version and $VAULT_IMAGE:$version"
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - name: Log in to GHCR
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push the pipeline image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: docker/Dockerfile
+          push: true
+          tags: ${{ steps.image_tags.outputs.pipeline }}
+
+      - name: Push the vault-tools image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: docker/Dockerfile.vault
+          push: true
+          tags: ${{ steps.image_tags.outputs.vault }}
