@@ -24,7 +24,7 @@ jobs:
   images:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Build the pipeline image
         run: docker build -f docker/Dockerfile -t nightshift:ci .
@@ -80,7 +80,7 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Work out the tags for this ref
         # main publishes `latest`; a git tag publishes that version and nothing
