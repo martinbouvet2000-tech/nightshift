@@ -59,6 +59,31 @@ def cmd_run(args: argparse.Namespace) -> int:
     return 0
 
 
+DEMO_OUT = "demo-vault"
+
+
+def demo_out(requested: str, *, explicit: bool) -> tuple[Path, bool]:
+    """Where the demo writes, falling back when the working directory is read-only.
+
+    A container, a read-only checkout or an install directory owned by another
+    user would otherwise turn a one-minute demo into a permission error. An
+    explicit --out is never overridden: if you asked for a path, you get that
+    path or an error. The real vault is never a candidate — demo notes have no
+    business in it.
+    """
+    out = Path(requested).expanduser().resolve()
+    try:
+        out.mkdir(parents=True, exist_ok=True)
+        probe = out / ".nightshift-write-test"
+        probe.touch()
+        probe.unlink()
+        return out, False
+    except OSError:
+        if explicit:
+            raise
+        return Path(tempfile.mkdtemp(prefix="nightshift-demo-")), True
+
+
 def cmd_demo(args: argparse.Namespace) -> int:
     from nightshift.config import DEFAULTS, deep_merge
     from nightshift.pipeline import run_pipeline
@@ -67,7 +92,9 @@ def cmd_demo(args: argparse.Namespace) -> int:
     if not ex or not ex.is_dir():
         print("error: sample transcripts not found; pass --examples PATH", file=sys.stderr)
         return 2
-    out = Path(args.out).resolve()
+    out, fell_back = demo_out(args.out, explicit=args.out != DEMO_OUT)
+    if fell_back:
+        print(f"note: ./{DEMO_OUT} is not writable here, using {out} instead")
     profile = ex / "profile.example.yaml"
     if not profile.exists():
         profile = ex.parent / "profile.example.yaml"
@@ -117,7 +144,7 @@ def build_parser() -> argparse.ArgumentParser:
     r.set_defaults(func=cmd_run)
 
     d = sub.add_parser("demo", help="offline demo on bundled sample transcripts")
-    d.add_argument("--out", default="demo-vault", help="output vault folder (default: ./demo-vault)")
+    d.add_argument("--out", default=DEMO_OUT, help="output vault folder (default: ./demo-vault)")
     d.add_argument("--examples", help="folder of sample transcripts (default: bundled examples)")
     d.set_defaults(func=cmd_demo)
 

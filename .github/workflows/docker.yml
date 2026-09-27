@@ -30,13 +30,14 @@ jobs:
         run: docker build -f docker/Dockerfile -t nightshift:ci .
 
       - name: Run the offline demo inside the container
+        # Writing to the mounted volume, as a deployment would: the image runs
+        # as uid 1000 and must never need write access to its own /app.
         run: |
-          mkdir -p /tmp/vault
+          mkdir -p /tmp/vault && chmod 777 /tmp/vault
           docker run --rm \
-            -e NIGHTSHIFT_VAULT=/vault \
             -v /tmp/vault:/vault \
             --entrypoint nightshift \
-            nightshift:ci demo
+            nightshift:ci demo --out /vault
 
       - name: The demo must have written notes to the mounted vault
         run: |
