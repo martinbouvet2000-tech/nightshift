@@ -1,6 +1,6 @@
-# The failures your agent will never log
+# My agent logged zero failures in 37 nights. It ran on 22 of them
 
-*37 nights of a scheduled Claude Code agent, measured from outside the process.*
+*A scheduled Claude Code agent, measured from outside the process.*
 
 My night agent has never reported a failure. Not once, across 65 daily journals.
 
