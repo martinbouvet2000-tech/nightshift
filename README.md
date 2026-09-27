@@ -101,9 +101,12 @@ node --test vault/test/*.test.mjs nightly/test/*.test.mjs     # 24 tests
 ## Run it on a NAS
 
 A laptop is the wrong host for this. The capture runs are scheduled, the night
-agent runs at 00:30, and a closed lid means a night that never happened — the
-terminal on my profile says `no run for N days` often enough to prove it. A box
-that stays on solves that, and it already sits next to the notes.
+agent runs at 00:30, and a closed lid means a night that never happened. I
+counted: over 37 nights my agent delivered a report on 22 of them, and its own
+failure logging recorded zero failures the whole time, because that logging runs
+inside the process that stops existing. The numbers, the method and what does
+and does not fix it are in [37 nights](docs/37-nights.md). A box that stays on
+addresses the part no retry can, and it already sits next to the notes.
 
 ```bash
 cp pipeline/config.example.yaml config/nightshift.yaml   # then edit it
