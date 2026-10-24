@@ -11,6 +11,7 @@ import { audit } from '../audit.mjs';
 import { fixLinks } from '../fix-links.mjs';
 import { normalizeVault } from '../normalize.mjs';
 import { backup } from '../backup.mjs';
+import { generateIndexes, indexTargets } from '../indexes.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const FIXTURE = path.join(here, 'fixtures', 'sample-vault');
@@ -167,4 +168,41 @@ test('backup skips cleanly outside a git repo and when the maintenance lock exis
   fs.writeFileSync(path.join(v, cfg.maintenanceLock), '');
   assert.equal(backup(v, cfg, { git: (...a) => calls.push(a), log: () => {} }).status, 'skipped-locked');
   assert.equal(calls.length, 0);
+});
+
+test('indexes: dry-run writes nothing, --apply links every note once, a second pass is a no-op', () => {
+  const v = tmpVault(); const config = loadConfig(v);
+  fs.mkdirSync(path.join(v, 'Ideas'));
+  for (const [name, score, created] of [['Seed Library', 7, '2026-01-03'], ['Tool Rental', 9, '2026-01-05'], ['Compost Club', 4, '2025-12-20']]) {
+    fs.writeFileSync(path.join(v, 'Ideas', `${name}.md`), `---
+tags:
+  - idea
+created: ${created}
+updated: ${created}
+type: idea
+score: ${score}
+status: new
+---
+
+# ${name}
+`);
+  }
+  assert.deepEqual(indexTargets(v, config).map(t => t.folder), ['Journal', 'Ideas']);
+  const before = snapshot(v);
+  assert.equal(generateIndexes(v, config).changed, 2);
+  assert.deepEqual(snapshot(v), before, 'dry-run writes nothing');
+
+  assert.ok(audit(v, config).issues.some(i => i.rule === 'orphan' && i.file === 'Ideas/Seed Library.md'));
+  generateIndexes(v, config, { apply: true, now: new Date(2026, 0, 10) });
+  const idx = fs.readFileSync(path.join(v, 'Ideas', 'Index - Ideas.md'), 'utf8');
+  assert.equal(parseFrontmatter(idx).fields.type, 'index');
+  assert.ok(idx.indexOf('[[Tool Rental]]') < idx.indexOf('[[Seed Library]]'), 'highest score first');
+  assert.ok(idx.indexOf('## 2026-01') < idx.indexOf('## 2025-12'), 'newest month first');
+  const res = audit(v, config);
+  assert.ok(!res.issues.some(i => i.rule === 'orphan' && i.file.startsWith('Ideas/')), 'no idea is an orphan, the index is not one either');
+  assert.ok(!res.issues.some(i => i.file.startsWith('Ideas/Index') && i.severity === 'error'), 'index obeys the contract');
+
+  const after1 = snapshot(v);
+  assert.equal(generateIndexes(v, config, { apply: true, now: new Date(2026, 0, 11) }).changed, 0);
+  assert.deepEqual(snapshot(v), after1, 'unchanged listing: updated is not bumped');
 });

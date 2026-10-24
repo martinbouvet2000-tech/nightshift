@@ -4,6 +4,7 @@
 //
 //   node vault/entry.mjs audit --strict
 //   node vault/entry.mjs fix-links --dry-run
+//   node vault/entry.mjs indexes --apply
 //
 // Every tool reads the vault from --vault or NIGHTSHIFT_VAULT, so nothing is
 // injected here: the subcommand is mapped to a script and the rest is forwarded
@@ -18,6 +19,7 @@ export const COMMANDS = Object.freeze({
   audit: 'audit.mjs',
   'fix-links': 'fix-links.mjs',
   normalize: 'normalize.mjs',
+  indexes: 'indexes.mjs',
   backup: 'backup.mjs',
   write: 'vault-writer.mjs',
 });

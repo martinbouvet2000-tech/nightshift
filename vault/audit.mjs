@@ -8,6 +8,7 @@ import {
   parseArgs, resolveVault, loadConfig, parseFrontmatter, extractLinks, firstH1, roleOf,
   buildResolver, isGenerated, fold, isMain,
 } from './lib.mjs';
+import { isIndexFile } from './indexes.mjs';
 
 const HELP = `audit — read-only vault health check
 
@@ -67,10 +68,11 @@ export function audit(vault, config, { inboxMax = config.inboxMax, now = Date.no
     }
   }
 
-  // Orphans: no inbound link from any other note (journal, root and index notes exempt).
+  // Orphans: no inbound link from any other note (journal, root and index notes exempt:
+  // an index is an entry point, see indexes.mjs).
   for (const n of resolver.notes) {
     const role = roleOf(n.rel, config);
-    if (n.rel === config.indexFile || role === 'journal' || role === 'root') continue;
+    if (n.rel === config.indexFile || role === 'journal' || role === 'root' || isIndexFile(n.rel)) continue;
     if (!inbound.has(path.basename(n.rel, '.md'))) add('orphan', n.rel);
   }
 
