@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nightshift-brain"
-version = "0.2.0"
+version = "0.3.0"
 description = "A second brain that works while you sleep: videos, feeds and transcripts into scored, linked Markdown notes."
 readme = "README.md"
 requires-python = ">=3.10"

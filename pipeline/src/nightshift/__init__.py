@@ -1,4 +1,4 @@
 """nightshift: a nightly knowledge pipeline that turns videos and transcripts
 into a linked Markdown second brain."""
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"

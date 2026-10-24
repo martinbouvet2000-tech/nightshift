@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+See the [Roadmap](README.md#roadmap) for what is being considered next.
+
+## [0.3.0] - 2026-10-24
+
 ### Added
 
 - `rss` source (closes #1): RSS 2.0, RSS 1.0 and Atom, standard library only. Full content first
@@ -30,8 +34,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The sample transcripts moved inside the package (`nightshift/examples`), so `nightshift demo` works
   from an installed wheel, not only from a clone.
 - Pipeline tests 91 → 100.
-
-See the [Roadmap](README.md#roadmap) for what is being considered next.
 
 ## [0.2.0] - 2026-10-24
 
@@ -133,6 +135,7 @@ First public release — the open-source core of a personal system, with the per
   original personal setup.
 - Social-network connectors are not included: they rely on unofficial APIs.
 
-[Unreleased]: https://github.com/martinbouvet2000-tech/nightshift/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/martinbouvet2000-tech/nightshift/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/martinbouvet2000-tech/nightshift/releases/tag/v0.3.0
 [0.2.0]: https://github.com/martinbouvet2000-tech/nightshift/releases/tag/v0.2.0
 [0.1.0]: https://github.com/martinbouvet2000-tech/nightshift/commit/ac993f1
