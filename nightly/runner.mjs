@@ -8,6 +8,8 @@
 //   - verification of the final `NIGHTSHIFT_OK <journal> notes=N links=N proposals=N` line
 //   - a failure trace in the journal note when the agent left no report (absence = signal)
 //   - persistent state (last_success, counters) in state.json
+//   - the machine stays awake while it runs, and a night that never ran is written down the next time
+//   - index notes regenerated before the agent starts, so new captures are never orphans
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -17,6 +19,7 @@ import { parseArgs, loadConfig, walk, isGenerated, localDate, isMain } from '../
 import { journal as writerJournal } from '../vault/vault-writer.mjs';
 import { audit } from '../vault/audit.mjs';
 import { backup } from '../vault/backup.mjs';
+import { generateIndexes, isIndexFile } from '../vault/indexes.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 
@@ -30,6 +33,7 @@ export const DEFAULTS = Object.freeze({
   dayStartHour: 6,
   maxCandidates: 40,
   maxLogs: 30,
+  gapHours: 30,
   permissionMode: 'acceptEdits',
   // Empty on purpose: Claude Code already limits Read/Glob/Grep, and Edit/Write under acceptEdits,
   // to the working directory (the vault). A bare 'Read' or 'Bash(git diff:*)' here would let a
@@ -52,6 +56,8 @@ Usage: node runner.mjs [--vault <path>] [options]
   --permission-mode <m> value passed to --permission-mode (default ${DEFAULTS.permissionMode})
   --journal <date>      force the journal date (YYYY-MM-DD)
   --backup              run vault/backup.mjs after the agent (git commit + push if the vault is a repo)
+  --no-keep-awake       do not hold off system sleep during the run
+  --no-indexes          do not regenerate the index notes (vault/indexes.mjs) before the agent
   --dry-run             print the exact command and exit, without calling claude or writing anything
   --print-prompt        with --dry-run, also print the rendered prompt
 
@@ -108,6 +114,64 @@ export function classify({ code, stdout = '', stderr = '', timedOut = false }, j
   if (/API Error|overloaded|ECONNREFUSED|ECONNRESET|ENOTFOUND|ETIMEDOUT|Connection refused|\b5\d\d\b.*error/i.test(all)) return 'api';
   if (code === 0) return 'noack';
   return 'error';
+}
+
+/**
+ * Nights skipped since the last success. Null when the last success is recent (< gapHours) or
+ * unknown: a first run is not a missed night.
+ */
+export function missedNights(now, lastSuccess, gapHours = DEFAULTS.gapHours) {
+  const ls = lastSuccess ? Date.parse(lastSuccess) : NaN;
+  const t = new Date(now).getTime();
+  if (!Number.isFinite(ls) || t - ls < gapHours * 3600e3) return null;
+  return { since: new Date(ls), nights: Math.max(1, Math.floor((t - ls) / 86400e3)) };
+}
+
+export const gapMarker = journal => `<!-- nightshift-gap ${journal} -->`;
+
+/**
+ * Write the gap into the journal, once per journal date. A night that never ran leaves nothing
+ * behind: no process, no log, no failure line. The next run is the first moment anything can say so.
+ */
+export function writeGapNote(vault, config, journal, { since, nights }) {
+  const fp = journalPath(vault, config, journal);
+  if (!fs.existsSync(fp)) writerJournal(vault, config, '', journal);
+  const existing = fs.readFileSync(fp, 'utf8');
+  if (existing.includes(gapMarker(journal))) return null;
+  const eol = existing.includes('\r\n') ? '\r\n' : '\n';
+  const lines = ['', gapMarker(journal),
+    `> ⚠️ No successful night shift since ${isoLocal(since)}: ${nights} night${nights > 1 ? 's' : ''} missed. Nothing was logged because nothing ran: the machine was most likely asleep or off. See docs/37-nights.md.`, ''];
+  fs.appendFileSync(fp, (existing.endsWith('\n') ? '' : eol) + lines.join(eol), 'utf8');
+  return fp;
+}
+
+// ─── Keep awake ─────────────────────────────────────────────────────
+
+/**
+ * Command that holds off system sleep while process `pid` lives, or null when the platform has none.
+ * Each one exits on its own when the runner dies, so a crash never leaves the machine awake.
+ */
+export function keepAwakeCommand(platform, pid) {
+  if (platform === 'win32') {
+    // ES_CONTINUOUS | ES_SYSTEM_REQUIRED, held by this thread until the runner is gone.
+    const ps = "Add-Type -Namespace NS -Name P -MemberDefinition '[DllImport(\"kernel32.dll\")] public static extern uint SetThreadExecutionState(uint f);';"
+      + ` [NS.P]::SetThreadExecutionState(2147483649) | Out-Null; while (Get-Process -Id ${pid} -ErrorAction SilentlyContinue) { Start-Sleep -Seconds 20 }`;
+    return { bin: 'powershell', args: ['-NoProfile', '-NonInteractive', '-Command', ps] };
+  }
+  if (platform === 'darwin') return { bin: 'caffeinate', args: ['-i', '-w', String(pid)] };
+  if (platform === 'linux') return { bin: 'systemd-inhibit', args: ['--what=sleep:idle', '--who=nightshift', '--why=night shift running', '--mode=block', 'tail', `--pid=${pid}`, '-f', '/dev/null'] };
+  return null;
+}
+
+/** Start the keep-awake helper. Returns a stop() function; a missing helper is not an error. */
+export function keepAwake(pid = process.pid, platform = process.platform) {
+  const c = keepAwakeCommand(platform, pid);
+  if (!c) return { active: false, stop() {} };
+  try {
+    const child = spawn(c.bin, c.args, { stdio: 'ignore', windowsHide: true });
+    child.on('error', () => {});
+    return { active: true, stop() { try { child.kill(); } catch {} } };
+  } catch { return { active: false, stop() {} }; }
 }
 
 // ─── Lock ───────────────────────────────────────────────────────────
@@ -176,7 +240,7 @@ export function writeFailureTrace(vault, config, journal, { runId, model, reason
 export function changedNotes(vault, config, since, max = DEFAULTS.maxCandidates) {
   const byRel = new Map();
   for (const f of walk(vault, config)) {
-    if (f.rel === config.indexFile || f.rel.startsWith(config.folders.journal + '/') || isGenerated(f.rel, config)) continue;
+    if (f.rel === config.indexFile || f.rel.startsWith(config.folders.journal + '/') || isGenerated(f.rel, config) || isIndexFile(f.rel)) continue;
     const m = fs.statSync(f.abs).mtimeMs;
     if (m >= since.getTime()) byRel.set(f.rel, m);
   }
@@ -184,7 +248,7 @@ export function changedNotes(vault, config, since, max = DEFAULTS.maxCandidates)
     const r = spawnSync('git', ['log', `--since=${since.toISOString()}`, '--name-only', '--pretty=format:', '--', '*.md'], { cwd: vault, encoding: 'utf8', windowsHide: true });
     for (const rel of (r.stdout || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean)) {
       const abs = path.join(vault, rel);
-      if (!byRel.has(rel) && fs.existsSync(abs) && !rel.startsWith(config.folders.journal + '/') && !rel.startsWith(config.folders.templates + '/') && !isGenerated(rel, config)) byRel.set(rel, fs.statSync(abs).mtimeMs);
+      if (!byRel.has(rel) && fs.existsSync(abs) && !rel.startsWith(config.folders.journal + '/') && !rel.startsWith(config.folders.templates + '/') && !isGenerated(rel, config) && !isIndexFile(rel)) byRel.set(rel, fs.statSync(abs).mtimeMs);
     }
   }
   const all = [...byRel.entries()].sort((a, b) => b[1] - a[1]).map(([rel]) => rel);
@@ -289,6 +353,8 @@ export function resolveOptions(flags, env = process.env) {
     permissionMode: flags['permission-mode'] || DEFAULTS.permissionMode,
     journal: typeof flags.journal === 'string' ? flags.journal : null,
     backup: !!flags.backup,
+    keepAwake: !flags['no-keep-awake'],
+    indexes: !flags['no-indexes'],
     dryRun: !!flags['dry-run'],
     printPrompt: !!flags['print-prompt'],
     config: typeof flags.config === 'string' ? flags.config : undefined,
@@ -315,6 +381,7 @@ export async function runNightly(o, deps = {}) {
   const sinceIso = isoLocal(since);
   const cmd = buildCommand(o);
 
+  const render = () => {
   const candidates = changedNotes(o.vault, config, since);
   const vars = {
     VAULT: o.vault, SINCE: sinceIso, JOURNAL: journal, RUN_ID: runId, MODEL: o.model,
@@ -324,7 +391,9 @@ export async function runNightly(o, deps = {}) {
     CANDIDATES: candidates.list.length ? candidates.list.map(r => `- ${r}`).join('\n') + (candidates.total > candidates.list.length ? `\n- (${candidates.total - candidates.list.length} older changes not listed: budget ${DEFAULTS.maxCandidates})` : '') : '- (none)',
     AUDIT: auditSummary(o.vault, config),
   };
-  const prompt = renderPrompt(fs.readFileSync(o.promptFile, 'utf8'), vars);
+  return { candidates, prompt: renderPrompt(fs.readFileSync(o.promptFile, 'utf8'), vars) };
+  };
+  let { candidates, prompt } = render();
 
   if (o.dryRun) {
     out(`journal=${journal} since=${sinceIso} run_id=${runId} model=${o.model} candidates=${candidates.total}`);
@@ -349,7 +418,21 @@ export async function runNightly(o, deps = {}) {
   if (!lock.ok) { log(`another run is active (${lock.reason}): exiting`); return { status: 'locked', exitCode: 3 }; }
 
   let status = 'error', result = null, ack = null;
+  const awake = o.keepAwake ? (deps.keepAwake || keepAwake)() : { active: false, stop() {} };
   try {
+    if (awake.active) log('keep-awake on: system sleep held off until the run ends');
+    const gap = missedNights(now, state.last_success);
+    if (gap) {
+      writeGapNote(o.vault, config, journal, gap);
+      log(`gap: no success since ${isoLocal(gap.since)} (${gap.nights} night(s) missed), noted in the journal`);
+    }
+    if (o.indexes) {
+      try {
+        const ix = generateIndexes(o.vault, config, { apply: true, now });
+        log(`indexes: ${ix.changed} of ${ix.results.length} index note(s) rewritten`);
+        if (ix.changed) ({ candidates, prompt } = render());
+      } catch (e) { log(`indexes error: ${e.message}`); }
+    }
     log(`run ${runId}: journal=${journal} since=${sinceIso} model=${o.model} candidates=${candidates.total}${lock.tookOver ? ' (stale lock taken over)' : ''}`);
     for (let attempt = 1; attempt <= 2; attempt++) {
       log(`attempt ${attempt}: ${formatCommand(cmd)}`);
@@ -398,6 +481,7 @@ export async function runNightly(o, deps = {}) {
     writeState(stateFile, next);
     status = success ? 'ok' : status;
   } finally {
+    awake.stop();
     releaseLock(lockFile);
   }
 
@@ -420,7 +504,7 @@ function rotateLogs(dir, keep) {
 }
 
 async function main(argv) {
-  const { flags } = parseArgs(argv, ['dry-run', 'print-prompt', 'backup', 'help']);
+  const { flags } = parseArgs(argv, ['dry-run', 'print-prompt', 'backup', 'no-keep-awake', 'no-indexes', 'help']);
   if (flags.help) { console.log(HELP); return 0; }
   const r = await runNightly(resolveOptions(flags));
   return r.exitCode;

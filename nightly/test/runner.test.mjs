@@ -9,6 +9,7 @@ import { loadConfig, parseFrontmatter } from '../../vault/lib.mjs';
 import {
   journalDate, computeSince, parseOkLine, classify, acquireLock, releaseLock,
   writeFailureTrace, runNightly, resolveOptions, readState,
+  missedNights, writeGapNote, gapMarker, keepAwakeCommand,
 } from '../runner.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -96,7 +97,7 @@ test('failure trace: creates a contract journal note and appends a block', () =>
 });
 
 function opts(v, extra = {}) {
-  return { ...resolveOptions({ vault: v, 'state-dir': mkTmp('nightshift-state-') }), ...extra };
+  return { ...resolveOptions({ vault: v, 'state-dir': mkTmp('nightshift-state-') }), keepAwake: false, ...extra };
 }
 
 test('runNightly success: OK line verified, state persisted, no failure trace', async () => {
@@ -185,4 +186,55 @@ test('default invoker feeds the prompt on stdin and kills the process tree on ti
   const slow = await spawnClaude({ bin: process.execPath, args: ['-e', 'setTimeout(() => {}, 30000)'], cwd: os.tmpdir() }, '', 300);
   assert.equal(slow.timedOut, true);
   assert.ok(Date.now() - t0 < 10e3);
+});
+
+test('missed nights: null when recent or unknown, counted otherwise', () => {
+  const now = new Date(2026, 0, 20, 0, 30);
+  const t = now.getTime();
+  assert.equal(missedNights(now, null), null, 'first run is not a gap');
+  assert.equal(missedNights(now, new Date(t - 24 * H).toISOString()), null, 'last night ran');
+  assert.equal(missedNights(now, new Date(t - 29 * H).toISOString()), null, 'late run, still not a gap');
+  assert.equal(missedNights(now, new Date(t - 49 * H).toISOString()).nights, 2);
+  assert.equal(missedNights(now, new Date(t - 31 * H).toISOString()).nights, 1);
+});
+
+test('gap note: written once per journal date, contract journal created if missing', () => {
+  const v = tmpVault(); const config = loadConfig(v);
+  const since = new Date(2026, 0, 12, 0, 31);
+  const fp = writeGapNote(v, config, '2026-01-15', { since, nights: 3 });
+  const txt = fs.readFileSync(fp, 'utf8');
+  assert.equal(parseFrontmatter(txt).present, true);
+  assert.match(txt, /3 nights missed/);
+  assert.equal(writeGapNote(v, config, '2026-01-15', { since, nights: 3 }), null, 'idempotent');
+  assert.equal(fs.readFileSync(fp, 'utf8').split(gapMarker('2026-01-15')).length, 2);
+});
+
+test('keep-awake: one helper per platform, each bound to the runner pid', () => {
+  const w = keepAwakeCommand('win32', 4242);
+  assert.equal(w.bin, 'powershell');
+  assert.match(w.args.at(-1), /SetThreadExecutionState\(2147483649\)/);
+  assert.match(w.args.at(-1), /Get-Process -Id 4242/);
+  assert.deepEqual(keepAwakeCommand('darwin', 4242), { bin: 'caffeinate', args: ['-i', '-w', '4242'] });
+  assert.ok(keepAwakeCommand('linux', 4242).args.includes('--pid=4242'));
+  assert.equal(keepAwakeCommand('aix', 4242), null);
+});
+
+test('runNightly: keeps awake for the run, notes a gap, builds indexes before the agent', async () => {
+  const v = tmpVault(); const o = opts(v, { keepAwake: true });
+  fs.mkdirSync(o.stateDir, { recursive: true });
+  const now = new Date(2026, 0, 14, 0, 30);
+  fs.writeFileSync(path.join(o.stateDir, 'state.json'), JSON.stringify({ last_success: new Date(2026, 0, 11, 0, 31).toISOString() }));
+  const events = [];
+  const r = await runNightly(o, {
+    now, log: () => {},
+    keepAwake: () => { events.push('awake'); return { active: true, stop: () => events.push('stop') }; },
+    invoke: async () => {
+      events.push('agent');
+      assert.ok(fs.existsSync(path.join(v, 'Journal', 'Index - Journal.md')), 'index written before the agent');
+      return { code: 0, stdout: 'NIGHTSHIFT_OK 2026-01-13 notes=0 links=0 proposals=0\n', stderr: '' };
+    },
+  });
+  assert.equal(r.status, 'ok');
+  assert.deepEqual(events, ['awake', 'agent', 'stop']);
+  assert.match(fs.readFileSync(path.join(v, 'Journal', '2026-01-13.md'), 'utf8'), /2 nights missed/);
 });

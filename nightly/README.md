@@ -24,6 +24,9 @@ node runner.mjs --vault ~/notes --backup           # + git commit/push of the va
 | Success | Last output line `NIGHTSHIFT_OK <journal> notes=N links=N proposals=N` with the right date, or a report found in the journal |
 | Failure | A `## Nightshift — <date>` block with the reason is appended to the journal note, so "did not run" is never silent |
 | State | `state.json`: `last_success`, `journal`, `run_id`, `model`, `notes`, `links`, `proposals`, `runs_total`, `failures_total`, `consecutive_failures`, `last_status` |
+| Keep awake | System sleep held off while the runner lives: `SetThreadExecutionState` (Windows), `caffeinate` (macOS), `systemd-inhibit` (Linux). The helper exits with the runner. `--no-keep-awake` to disable |
+| Missed nights | Last success older than 30 h → a `nightshift-gap` callout in the journal before the agent starts, once per date. A night that never ran leaves no log; the next morning says so |
+| Indexes | `vault/indexes.mjs --apply` before the agent, so new captures have an inbound link. `--no-indexes` to disable |
 | Logs | `logs/run_<id>.log` + raw agent output, last 30 runs kept |
 
 The prompt (`nightly-prompt.md`) is rendered with the window, the journal date, the list of notes
@@ -40,7 +43,7 @@ renames, merges and deletions.
 | `--state-dir` | `NIGHTSHIFT_STATE_DIR` | `~/.nightshift/nightly` |
 | `--model` | `NIGHTSHIFT_MODEL` | `claude-sonnet-5` |
 | `--claude` | `NIGHTSHIFT_CLAUDE` | `claude` |
-| `--prompt`, `--timeout-min`, `--retry-wait-min`, `--allowed-tools`, `--permission-mode`, `--journal`, `--backup`, `--dry-run`, `--print-prompt` | | see `--help` |
+| `--prompt`, `--timeout-min`, `--retry-wait-min`, `--allowed-tools`, `--permission-mode`, `--journal`, `--backup`, `--no-keep-awake`, `--no-indexes`, `--dry-run`, `--print-prompt` | | see `--help` |
 
 ## Scheduling
 

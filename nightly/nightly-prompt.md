@@ -12,6 +12,9 @@ You run unattended while the owner sleeps. They read your report in the journal 
 - PARA folders: `{{FOLDERS}}`
 - Pipeline-generated notes (link TO them, never write INTO them): `{{GENERATED}}`
 - Index file (generated, never edit): `{{INDEX_FILE}}` · inbox limit: {{INBOX_MAX}} items
+- Index notes (`Index - <folder>.md`, `type: index`) are rewritten by the runner before you start:
+  never edit them, never count them as orphans. A `nightshift-gap` callout in the journal was written
+  by the runner: it means previous nights did not run. Repeat it in one line of your report.
 
 All paths below are relative to the vault.
 
@@ -134,6 +137,8 @@ line): its absence is how the owner knows the night shift did not run.
 - Respect the data contract: tags as a YAML list, `created` + `updated`, H1 = filename, no link to a
   missing note.
 - No deletion, no rename, no move. Git: read-only commands only. Never run a script with `--apply`.
+- In the report, write a broken link you cite as `code`, never as `[[link]]`: quoting it between
+  double brackets recreates the very link you are reporting, in the journal, every night.
 - Edit notes one by one with the Edit tool; no mass-rewrite scripts.
 
 ## Final line
