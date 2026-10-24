@@ -7,8 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+See the [Roadmap](README.md#roadmap) for what is being considered next.
+
+## [0.2.0] - 2026-10-24
+
 ### Added
 
+- `vault/indexes.mjs` (`node vault/entry.mjs indexes`): one `Index - <folder>` note per capture
+  folder, newest month first, optionally sorted by `score`. Captured notes stop being orphans: a
+  query-based MOC shows them but creates no link. Dry-run by default; rewrites a note only when its
+  listing changes, so `updated` and git stay quiet. Configurable with `indexes` in `vault.config.json`.
+- Runner: holds off system sleep for the whole run (`SetThreadExecutionState`, `caffeinate`,
+  `systemd-inhibit`), with a helper that exits with the runner. `--no-keep-awake` to disable.
+- Runner: when the last success is older than 30 h, writes a `nightshift-gap` callout into the
+  journal before the agent starts, once per date. Missed nights used to leave no trace at all.
+- Runner: regenerates the index notes before the agent, then re-renders the prompt with a fresh
+  audit. `--no-indexes` to disable.
+- `docs/37-nights.md`: addendum on modern standby. On the measured laptop, wake timers are disabled
+  on battery by the power plan, which overrules `WakeToRun` on the task. The fix is one `powercfg`
+  line, documented there.
 - Docker support: `docker/Dockerfile` (pipeline) and `docker/Dockerfile.vault` (vault tools),
   a `docker-compose.yml` with a scheduler inside the container, and a `docker` workflow that
   runs the offline demo *inside* the built image against a mounted volume.
@@ -18,10 +35,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- The suites have grown since 0.1.0: pipeline 70 → 91 (`pytest -q`), vault + nightly 19 → 24
-  (`node --test`). Published counts corrected to match.
-
-See the [Roadmap](README.md#roadmap) for what is being considered next.
+- The auditor treats `Index - <folder>` notes as entry points, not orphans.
+- The night prompt: index notes are never edited, a gap callout is repeated in the report, and a
+  broken link is cited as `code` in the report. Citing it as `[[link]]` recreated it every night.
+- Test counts: pipeline 70 → 91 (`pytest -q`), vault + nightly 19 → 29 (`node --test`).
 
 ## [0.1.0] - 2026-09-22
 
@@ -92,5 +109,6 @@ First public release — the open-source core of a personal system, with the per
   original personal setup.
 - Social-network connectors are not included: they rely on unofficial APIs.
 
-[Unreleased]: https://github.com/martinbouvet2000-tech/nightshift/compare/ac993f1...HEAD
+[Unreleased]: https://github.com/martinbouvet2000-tech/nightshift/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/martinbouvet2000-tech/nightshift/releases/tag/v0.2.0
 [0.1.0]: https://github.com/martinbouvet2000-tech/nightshift/commit/ac993f1

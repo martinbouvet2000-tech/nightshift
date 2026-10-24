@@ -324,15 +324,56 @@ reproducible; the sample is not a study. The pre-2026-09-07 classification is
 weaker than the rest, as noted above, and the same gap makes 4 of the 10 dark
 nights impossible to test for window recovery.
 
-I cannot say which of the dark nights were shutdown rather than hibernation, and
-I have not tested whether `WakeToRun` behaves the same under Windows' modern
-standby as under classic S3 sleep — both would change how much of the 27% is
-addressable at the scheduler layer. Nothing was running to record any of it,
-which is the document's own point turned back on its author.
+I cannot say which of the dark nights were shutdown rather than hibernation.
+When this was first published I had not tested whether `WakeToRun` behaves the
+same under Windows' modern standby as under classic S3 sleep. I have now, and the
+answer is in the addendum below: on this machine, on battery, it does nothing.
+Nothing was running to record any of it, which is the document's own point
+turned back on its author.
 
 What I have not done is the obvious next experiment: move the capture jobs to a
 host that stays on and measure the same 37 nights again. Until that number
 exists, the case for the move rests on the mechanism, not on a comparison.
+
+## Addendum, October 2026: the wake-up that was switched off
+
+Two more nights went dark in mid-October, the 16th and the 17th, and this time I
+went looking for the setting instead of the scheduler. `powercfg /a` on this
+laptop lists exactly one sleep state, S0 low-power idle, the one Windows calls
+modern standby. Classic S3 sleep is not offered by the firmware at all. The
+power plan then has a separate switch for wake timers, set per power source:
+
+```
+powercfg /q SCHEME_CURRENT SUB_SLEEP RTCWAKE
+  AC (plugged in) : 1   enabled
+  DC (battery)    : 0   disabled
+```
+
+So the open question above has a plain answer on this machine. `WakeToRun: True`
+on the task asks for a wake timer, and on battery the power plan refuses every
+wake timer before the task is even considered. The scheduler setting I told you
+to check was correct, and it was overruled by a power setting one layer further
+down. Check that one too:
+
+```
+powercfg /setdcvalueindex SCHEME_CURRENT SUB_SLEEP RTCWAKE 1
+powercfg /setactive SCHEME_CURRENT
+```
+
+It costs battery, which is why the default is off. Plugging the machine in at
+night does the same thing for free.
+
+Two changes went into the runner off the back of this. It now holds off sleep
+for as long as it runs (`SetThreadExecutionState` on Windows, `caffeinate` on
+macOS, `systemd-inhibit` on Linux), so a run that does start is not put to sleep
+halfway, and the helper dies with the runner, so a crash cannot leave the machine
+awake. And when the last success is more than 30 hours old, the next run writes
+the gap into the journal before doing anything else. A night that never started
+still leaves nothing behind at the time. The difference is that the next morning
+now says so, instead of looking like a quiet night.
+
+Neither of those wakes a machine. The `powercfg` line does that, and a box that
+stays on does it better.
 
 ---
 

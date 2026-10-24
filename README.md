@@ -69,8 +69,8 @@ flowchart LR
 | Path | What it is | Runtime | Tests |
 |---|---|---|---|
 | [`pipeline/`](pipeline) | Python package and CLI (`run`, `demo`, `health`). Pluggable sources, extraction and scoring stages, contract-safe note writer, a scheduler for boxes without cron, offline demo. | Python 3.10+, PyYAML | 91 |
-| [`vault/`](vault) | Node tools: a contract-aware writer, an auditor, a link fixer and a normaliser (dry-run by default), and a git backup, behind one entry point. | Node 18+, zero deps | 14 |
-| [`nightly/`](nightly) | The night shift: a cross-platform runner around `claude -p` and the consolidation prompt, plus scheduler examples for Task Scheduler, cron and launchd. | Node 18+, zero deps | 10 |
+| [`vault/`](vault) | Node tools: a contract-aware writer, an auditor, a link fixer a normaliser and an index generator (dry-run by default), and a git backup, behind one entry point. | Node 18+, zero deps | 15 |
+| [`nightly/`](nightly) | The night shift: a cross-platform runner around `claude -p` and the consolidation prompt, plus scheduler examples for Task Scheduler, cron and launchd. Holds off sleep while it runs and writes missed nights into the journal. | Node 18+, zero deps | 14 |
 | [`vault/CONTRACT.md`](vault/CONTRACT.md) | The data contract every note obeys — enforced by the writer, checked by the auditor. | — | — |
 | [`docker/`](docker) | Images for the pipeline and the vault tools, plus [`docker-compose.yml`](docker-compose.yml) — for a NAS or any box that stays on. Published to `ghcr.io/martinbouvet2000-tech/nightshift{,-vault}`. | Docker | built + demo run in CI |
 | [`assets/`](assets) | The images in this README. [`build_demo.py`](assets/build_demo.py) runs the demo in a throwaway directory and draws what it counted; [`build_social.py`](assets/build_social.py) draws the share card. | Python 3.10+ | — |
@@ -79,7 +79,7 @@ flowchart LR
 
 ```bash
 cd pipeline && pytest -q                                      # 91 tests
-node --test vault/test/*.test.mjs nightly/test/*.test.mjs     # 24 tests
+node --test vault/test/*.test.mjs nightly/test/*.test.mjs     # 29 tests
 ```
 
 ## Design decisions
@@ -88,6 +88,8 @@ node --test vault/test/*.test.mjs nightly/test/*.test.mjs     # 24 tests
 - **A data contract, enforced by code.** Every note has YAML `tags` as a list, `created` and `updated`, an H1 equal to its filename, and no links to notes that don't exist. The pipeline writes to it, the auditor checks it, and the night agent is told to respect it. See [`vault/CONTRACT.md`](vault/CONTRACT.md).
 - **Failure is designed in.** Writes are atomic, filenames are sanitised against path traversal and reserved names, and one bad item never aborts a run.
 - **The night agent proves it ran.** It must end with `NIGHTSHIFT_OK <journal> notes=N links=N proposals=N`. If that line is missing, the runner writes a failure line into your journal, so in the morning "nothing to do" is never confused with "didn't run".
+- **A night that never ran is written down.** Nothing logs a run that never started, so the next run checks the gap since the last success and puts it in the journal first. While it runs, it holds off system sleep. Why both exist: [37 nights](docs/37-nights.md), and its addendum on wake timers that a laptop switches off on battery.
+- **No orphan notes.** Before the agent starts, `vault/indexes.mjs` rewrites one index note per capture folder, so every new note has a real inbound link, for you in the graph and for an agent that follows links.
 - **Least privilege at night.** The agent runs in `acceptEdits` mode with no extra tool grants and no shell. It makes safe additive changes itself and only *proposes* risky ones.
 - **Scored against you, not against the internet.** Ideas are ranked with a `profile.yaml` you write: your interests, skills and constraints.
 
