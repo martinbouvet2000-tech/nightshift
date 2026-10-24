@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `rss` source (closes #1): RSS 2.0, RSS 1.0 and Atom, standard library only. Full content first
+  (`content:encoded`, Atom `content`), then description or summary, HTML reduced to text. Podcast
+  feeds that publish `<podcast:transcript>` get the transcript instead of the show notes, timed
+  formats (VTT, SRT) preferred. Stable ids per feed and entry, so a second run is a no-op.
+  Feeds are untrusted input: http(s) only, 10 MB cap, documents declaring XML entities refused,
+  one bad entry or one dead feed never stops the others. Entries under `min_chars` (title-only,
+  teasers) are skipped for good.
+- `nightshift health` reports the configured feeds.
+
+### Changed
+
+- `CONTRIBUTING.md`: the source walkthrough uses a read-later export, since RSS is now a real source.
+- Pipeline tests 91 → 100.
+
 See the [Roadmap](README.md#roadmap) for what is being considered next.
 
 ## [0.2.0] - 2026-10-24

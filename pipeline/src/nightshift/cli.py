@@ -136,7 +136,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     r = sub.add_parser("run", help="run the pipeline on the configured sources")
     r.add_argument("--config", help="config file (YAML/JSON); default: $NIGHTSHIFT_CONFIG or ./nightshift.yaml")
-    r.add_argument("--sources", help="comma-separated subset, e.g. youtube,local")
+    r.add_argument("--sources", help="comma-separated subset, e.g. youtube,rss,local")
     r.add_argument("--dry-run", action="store_true", help="process everything but write nothing")
     r.add_argument("--limit", type=int, help="maximum number of new items")
     r.add_argument("--backend", choices=["auto", "claude-cli", "anthropic-api", "regex"],

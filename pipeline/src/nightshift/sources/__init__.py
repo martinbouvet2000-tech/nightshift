@@ -4,11 +4,13 @@ from __future__ import annotations
 
 from nightshift.sources.base import Source, StateStore
 from nightshift.sources.local import LocalSource
+from nightshift.sources.rss import RSSSource
 from nightshift.sources.youtube import YouTubeSource
 
 SOURCES: dict[str, type[Source]] = {
     LocalSource.name: LocalSource,
     YouTubeSource.name: YouTubeSource,
+    RSSSource.name: RSSSource,
 }
 
 
@@ -17,4 +19,4 @@ def register_source(cls: type[Source]) -> type[Source]:
     return cls
 
 
-__all__ = ["SOURCES", "Source", "StateStore", "register_source", "LocalSource", "YouTubeSource"]
+__all__ = ["SOURCES", "Source", "StateStore", "register_source", "LocalSource", "YouTubeSource", "RSSSource"]

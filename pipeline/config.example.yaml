@@ -57,6 +57,16 @@ sources:
     cookies_from_browser: null      # e.g. firefox, if YouTube asks you to sign in
     max_attempts: 3                 # runs to retry a video without subtitles before giving up
 
+  rss:
+    enabled: false                  # standard library only, nothing to install
+    urls:                           # RSS 2.0, RSS 1.0 or Atom feeds: blogs, newsletters, podcasts
+      - https://example.com/feed.xml
+    max_per_feed: 20                # latest N entries inspected per feed
+    max_new_per_run: 20             # cap on new entries per run, all feeds combined
+    min_chars: 200                  # entries with less text (title-only, teasers) are skipped for good
+    podcast_transcripts: true       # use <podcast:transcript> when a podcast feed publishes one
+    timeout_seconds: 20
+
   local:
     enabled: true
     drop_folder: ./inbox            # .txt .md .vtt .srt used directly;

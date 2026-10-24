@@ -102,7 +102,9 @@ class Source(abc.ABC):
         raise NotImplementedError
 ```
 
-A minimal implementation, `pipeline/src/nightshift/sources/rss.py`:
+A minimal implementation, for a read-later export (`pipeline/src/nightshift/sources/readlater.py`).
+For a complete one with network access, size limits and podcast transcripts, read
+[`sources/rss.py`](pipeline/src/nightshift/sources/rss.py).
 
 ```python
 from __future__ import annotations
@@ -116,16 +118,16 @@ from nightshift.sources.base import Source
 log = logging.getLogger(__name__)
 
 
-class RSSSource(Source):
-    name = "rss"
+class ReadLaterSource(Source):
+    name = "readlater"
 
     def fetch(self, limit: int | None = None) -> Iterator[Item]:
         count = 0
-        for feed_url in self.cfg.get("feeds", []):
-            for entry in self._entries(feed_url):          # your parsing, your error handling
+        for export in self.cfg.get("exports", []):
+            for entry in self._entries(export):            # your parsing, your error handling
                 if limit is not None and count >= limit:
                     return
-                item_id = f"rss-{entry['guid']}"
+                item_id = f"readlater-{entry['id']}"
                 if self.state.is_done(self.name, item_id):  # never reprocess
                     continue
                 try:
@@ -147,16 +149,17 @@ class RSSSource(Source):
 Then register it in `pipeline/src/nightshift/sources/__init__.py`:
 
 ```python
-from nightshift.sources.rss import RSSSource
+from nightshift.sources.readlater import ReadLaterSource
 
 SOURCES: dict[str, type[Source]] = {
     LocalSource.name: LocalSource,
     YouTubeSource.name: YouTubeSource,
     RSSSource.name: RSSSource,
+    ReadLaterSource.name: ReadLaterSource,
 }
 ```
 
-Out-of-tree sources don't need to edit that file — call `register_source(RSSSource)` instead.
+Out-of-tree sources don't need to edit that file — call `register_source(ReadLaterSource)` instead.
 
 Checklist for the PR:
 

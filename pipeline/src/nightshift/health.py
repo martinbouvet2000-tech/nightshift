@@ -64,6 +64,10 @@ def run_checks(cfg: dict[str, Any] | None, cfg_error: str | None = None) -> list
         checks.append(("yt-dlp", OK if ytdlp_available() else WARN,
                        "installed" if ytdlp_available() else "not installed (youtube source disabled)"))
 
+    rss = srcs.get("rss") or {}
+    if rss.get("enabled"):
+        checks.append(("rss feeds", OK if rss.get("urls") else WARN, f"{len(rss.get('urls') or [])} configured"))
+
     checks.append(("whisper", OK if whisper_available() else WARN,
                    "installed" if whisper_available() else "not installed: audio/video files will be skipped"))
     checks.append(("ffmpeg", OK if ffmpeg_available() else WARN,

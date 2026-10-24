@@ -42,6 +42,15 @@ DEFAULTS: dict[str, Any] = {
             "cookies_from_browser": None,
             "max_attempts": 3,
         },
+        "rss": {
+            "enabled": False,
+            "urls": [],
+            "max_per_feed": 20,
+            "max_new_per_run": 20,
+            "min_chars": 200,
+            "podcast_transcripts": True,
+            "timeout_seconds": 20,
+        },
         "local": {
             "enabled": True,
             "drop_folder": "./inbox",

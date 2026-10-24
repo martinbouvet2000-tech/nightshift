@@ -14,7 +14,8 @@ You save videos, talks and notes all day and remember almost none of it. nightsh
 ```
 capture ─► transcribe ─► extract + score ─► write notes ─► night shift ─► backup
  YouTube    Whisper /     LLM (or offline   Obsidian-      Claude Code    git
- local dir  subtitles     heuristics)       ready vault    at 00:30
+ RSS, pods  subtitles     heuristics)       ready vault    at 00:30
+ local dir
 ```
 
 It's the open-source core of the system I run every day ([case study](https://martinbouvet2000-tech.github.io/work/ai-os.html)). The personal parts are gone. Everything here runs on your machine, and your notes stay plain Markdown.
@@ -48,7 +49,7 @@ node ../vault/audit.mjs --vault demo-vault --strict
 ```mermaid
 flowchart LR
   subgraph day [During the day, twice]
-    A[Sources<br/>YouTube, local folder] --> B[Transcribe<br/>subtitles or Whisper]
+    A[Sources<br/>YouTube, RSS/Atom, podcasts, local folder] --> B[Transcribe<br/>subtitles or Whisper]
     B --> C[Classify]
     C --> D[Extract<br/>tools, techniques, ideas]
     D --> E[Score<br/>signal 0-100, fit to your profile]
@@ -68,7 +69,7 @@ flowchart LR
 
 | Path | What it is | Runtime | Tests |
 |---|---|---|---|
-| [`pipeline/`](pipeline) | Python package and CLI (`run`, `demo`, `health`). Pluggable sources, extraction and scoring stages, contract-safe note writer, a scheduler for boxes without cron, offline demo. | Python 3.10+, PyYAML | 91 |
+| [`pipeline/`](pipeline) | Python package and CLI (`run`, `demo`, `health`). Pluggable sources, extraction and scoring stages, contract-safe note writer, a scheduler for boxes without cron, offline demo. | Python 3.10+, PyYAML | 100 |
 | [`vault/`](vault) | Node tools: a contract-aware writer, an auditor, a link fixer a normaliser and an index generator (dry-run by default), and a git backup, behind one entry point. | Node 18+, zero deps | 15 |
 | [`nightly/`](nightly) | The night shift: a cross-platform runner around `claude -p` and the consolidation prompt, plus scheduler examples for Task Scheduler, cron and launchd. Holds off sleep while it runs and writes missed nights into the journal. | Node 18+, zero deps | 14 |
 | [`vault/CONTRACT.md`](vault/CONTRACT.md) | The data contract every note obeys — enforced by the writer, checked by the auditor. | — | — |
@@ -78,7 +79,7 @@ flowchart LR
 | [`.github/workflows/docker.yml`](.github/workflows/docker.yml) | The third CI target: builds both images, runs the demo *inside* the container, and publishes to GHCR from `main` and tags. | — | — |
 
 ```bash
-cd pipeline && pytest -q                                      # 91 tests
+cd pipeline && pytest -q                                      # 100 tests
 node --test vault/test/*.test.mjs nightly/test/*.test.mjs     # 29 tests
 ```
 
@@ -95,7 +96,7 @@ node --test vault/test/*.test.mjs nightly/test/*.test.mjs     # 29 tests
 
 ## Set it up for real
 
-1. **Configure the pipeline.** Copy `pipeline/config.example.yaml` to `config.yaml` and `profile.example.yaml` to `profile.yaml`, then set your vault path (or the `NIGHTSHIFT_VAULT` env var) and your YouTube channels. Optional extras: `pip install -e ".[youtube]"` for yt-dlp and `pip install -e ".[whisper]"` for local transcription.
+1. **Configure the pipeline.** Copy `pipeline/config.example.yaml` to `config.yaml` and `profile.example.yaml` to `profile.yaml`, then set your vault path (or the `NIGHTSHIFT_VAULT` env var) and your sources: YouTube channels, RSS/Atom feeds (blogs, newsletters, podcasts; no extra needed), a local drop folder. Optional extras: `pip install -e ".[youtube]"` for yt-dlp and `pip install -e ".[whisper]"` for local transcription.
 2. **Run it:** `nightshift run`, or `nightshift run --sources local --limit 5` to start small. `nightshift health` checks your setup.
 3. **Add the night shift.** You need [Claude Code](https://claude.com/claude-code). Try `node nightly/runner.mjs --dry-run --vault <your vault>`, then schedule it with one of the examples in [`nightly/schedule/`](nightly/schedule).
 4. **Back up.** If your vault is a git repo, `node vault/backup.mjs --vault <your vault>` commits and pushes it. Schedule it too.
@@ -171,21 +172,22 @@ The full policy, including what is in and out of scope and how to report a probl
 
 ## Status and limits
 
-This is v0.1, extracted from a personal system that has been running daily, not a polished product.
+This is v0.2, extracted from a personal system that has been running daily, not a polished product.
 
 - The offline extractor is heuristic; LLM mode is much sharper.
 - YouTube and Whisper are covered by mocked tests only in CI.
 - Idea scoring against your profile is keyword-based.
 - The night runner is tested with a mocked `claude` call; the real prompt has only run in the original personal setup.
 - Social-network connectors aren't included: they rely on unofficial APIs.
+- RSS keeps only entries with real text (`min_chars`, 200 by default). A link aggregator's feed (Hacker News, Reddit) carries a title and a URL, not the article, so most of its entries are skipped.
 
-Issues and pull requests are welcome, especially new `Source` implementations (podcasts, RSS, read-later exports).
+Issues and pull requests are welcome, especially new `Source` implementations (read-later exports, podcast audio through Whisper).
 
 ## Roadmap
 
 Ideas, not promises, and not in any order. Nothing here is scheduled, and I'd rather merge a good PR than build all of it myself. Each item maps to a limitation above.
 
-- **More sources.** Podcasts (RSS with a transcript tag, audio through Whisper otherwise), plain RSS/Atom, and read-later exports (Pocket, Instapaper, Readwise). The `Source` interface exists for exactly this — see [Adding a new Source](CONTRIBUTING.md#adding-a-new-source). Official APIs and open formats only.
+- **More sources.** RSS/Atom and podcast transcripts (`<podcast:transcript>`) are in. Still open: podcast audio through Whisper when no transcript is published, and read-later exports (Pocket, Instapaper, Readwise). The `Source` interface exists for exactly this — see [Adding a new Source](CONTRIBUTING.md#adding-a-new-source). Official APIs and open formats only.
 - **Semantic idea scoring.** Profile fit is keyword matching today. Local embeddings would rank ideas by meaning instead of by vocabulary, without sending anything anywhere.
 - **Real-run coverage for the night runner.** The runner is well tested against a mocked `claude`; the prompt itself has only ever run in my setup. A reproducible end-to-end harness on a throwaway vault would turn that caveat into a test.
 - **Packaging to PyPI.** `pip install nightshift` instead of a clone and an editable install. Blocked on nothing but a naming check and a release workflow.
