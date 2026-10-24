@@ -20,7 +20,7 @@ Python 3.10+. The only required dependency is PyYAML.
 ## Try it offline
 
 ```bash
-nightshift demo                   # writes ./demo-vault from the samples in examples/
+nightshift demo                   # writes ./demo-vault from the bundled samples (src/nightshift/examples/)
 ```
 
 No network, no API key, no model: the demo uses the deterministic regex

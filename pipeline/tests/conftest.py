@@ -8,7 +8,7 @@ import pytest
 from nightshift import frontmatter
 
 PIPELINE_DIR = Path(__file__).resolve().parents[1]
-EXAMPLES = PIPELINE_DIR / "examples"
+EXAMPLES = PIPELINE_DIR / "src" / "nightshift" / "examples"
 PROFILE = PIPELINE_DIR / "profile.example.yaml"
 
 

@@ -190,7 +190,7 @@ Ideas, not promises, and not in any order. Nothing here is scheduled, and I'd ra
 - **More sources.** RSS/Atom and podcast transcripts (`<podcast:transcript>`) are in. Still open: podcast audio through Whisper when no transcript is published, and read-later exports (Pocket, Instapaper, Readwise). The `Source` interface exists for exactly this — see [Adding a new Source](CONTRIBUTING.md#adding-a-new-source). Official APIs and open formats only.
 - **Semantic idea scoring.** Profile fit is keyword matching today. Local embeddings would rank ideas by meaning instead of by vocabulary, without sending anything anywhere.
 - **Real-run coverage for the night runner.** The runner is well tested against a mocked `claude`; the prompt itself has only ever run in my setup. A reproducible end-to-end harness on a throwaway vault would turn that caveat into a test.
-- **Packaging to PyPI.** `pip install nightshift` instead of a clone and an editable install. Blocked on nothing but a naming check and a release workflow.
+- **Packaging to PyPI.** The release workflow is in: every version tag builds the wheel and proves it works on its own (demo outside the repo, audited). The distribution will be `nightshift-brain`, since `nightshift` is taken on PyPI; the command stays `nightshift`. What remains is switching on trusted publishing.
 
 If one of these matters to you, say so in an issue — that is the only prioritisation signal there is.
 

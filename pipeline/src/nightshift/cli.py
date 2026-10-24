@@ -27,9 +27,9 @@ def _utf8_stdout() -> None:
 
 
 def examples_dir() -> Path | None:
-    """Locate the bundled sample transcripts (``pipeline/examples``)."""
+    """Locate the bundled sample transcripts (shipped inside the package)."""
     candidates = [
-        Path(__file__).resolve().parents[2] / "examples",  # editable / source checkout
+        Path(__file__).resolve().parent / "examples",  # installed or editable: package data
         Path.cwd() / "examples",
         Path.cwd() / "pipeline" / "examples",
     ]

@@ -172,6 +172,20 @@ Checklist for the PR:
       `whisper`, and the source degrades with a clear log line when it isn't installed.
 - [ ] Tests in `pipeline/tests/test_sources.py` with the network mocked — see the existing ones.
 
+## Releasing
+
+1. Bump the version in `pipeline/pyproject.toml` and `pipeline/src/nightshift/__init__.py`, and move
+   the `Unreleased` entries of `CHANGELOG.md` under the new version.
+2. Tag and push: `git tag -a vX.Y.Z -m "nightshift X.Y.Z" && git push origin vX.Y.Z`.
+3. The `release` workflow builds the sdist and the wheel, checks that the tag matches the package
+   version, installs the wheel in a clean environment, runs the offline demo outside the repo and
+   audits the vault it wrote. The `docker` workflow tags both images with the version.
+4. PyPI publishing (distribution name `nightshift-brain`: `nightshift` was taken) uses trusted
+   publishing, so no token exists anywhere. One-time setup: on pypi.org, add a pending publisher
+   for project `nightshift-brain`, owner `martinbouvet2000-tech`, repository `nightshift`, workflow
+   `release.yml`, environment `pypi`; then set the repository variable `PYPI_PUBLISH` to `true`.
+   Until then the workflow builds and verifies, and publishes nothing.
+
 ## Reporting bugs and asking for features
 
 Use the issue templates: [bug report](.github/ISSUE_TEMPLATE/bug_report.yml),

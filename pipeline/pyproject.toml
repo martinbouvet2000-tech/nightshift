@@ -3,12 +3,28 @@ requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "nightshift"
+name = "nightshift-brain"
 version = "0.2.0"
-description = "Nightly knowledge pipeline: turn videos and transcripts into a linked Markdown second brain."
+description = "A second brain that works while you sleep: videos, feeds and transcripts into scored, linked Markdown notes."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
+authors = [{ name = "Martin Bouvet" }]
+keywords = ["second-brain", "obsidian", "markdown", "pkm", "rss", "youtube", "transcripts", "llm", "claude"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Text Processing :: Markup :: Markdown",
+    "Topic :: Utilities",
+]
 dependencies = [
     "PyYAML>=6.0",
 ]
@@ -19,11 +35,20 @@ whisper = ["openai-whisper>=20231117"]
 dev = ["pytest>=7.0"]
 all = ["yt-dlp>=2024.1.0", "openai-whisper>=20231117"]
 
+[project.urls]
+Homepage = "https://github.com/martinbouvet2000-tech/nightshift"
+Source = "https://github.com/martinbouvet2000-tech/nightshift"
+Changelog = "https://github.com/martinbouvet2000-tech/nightshift/blob/main/CHANGELOG.md"
+Issues = "https://github.com/martinbouvet2000-tech/nightshift/issues"
+
 [project.scripts]
 nightshift = "nightshift.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+nightshift = ["examples/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

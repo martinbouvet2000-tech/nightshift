@@ -17,10 +17,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   one bad entry or one dead feed never stops the others. Entries under `min_chars` (title-only,
   teasers) are skipped for good.
 - `nightshift health` reports the configured feeds.
+- `release` workflow: on a version tag, builds the sdist and wheel, checks the tag against the
+  package version, installs the wheel in a clean environment and runs the offline demo outside the
+  repo, then audits the result. PyPI publishing by trusted publishing, off until configured.
 
 ### Changed
 
-- `CONTRIBUTING.md`: the source walkthrough uses a read-later export, since RSS is now a real source.
+- `CONTRIBUTING.md`: the source walkthrough uses a read-later export, since RSS is now a real source,
+  and a Releasing section.
+- The package is named `nightshift-brain` for PyPI (`nightshift` is taken); the import and the
+  command are still `nightshift`. Project URLs, keywords and classifiers added.
+- The sample transcripts moved inside the package (`nightshift/examples`), so `nightshift demo` works
+  from an installed wheel, not only from a clone.
 - Pipeline tests 91 → 100.
 
 See the [Roadmap](README.md#roadmap) for what is being considered next.
